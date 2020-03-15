@@ -59,10 +59,10 @@ class TestFive:
 $ pytest
 
 ======================== test session starts ========================
-platform linux -- Python 3.x.y, pytest-5.x.y, py-1.x.y, pluggy-0.x.y
+platform linux -- Python 3.x.y, pytest-x.y.z, py-x.y.z, pluggy-x.y.z
 cachedir: $PYTHON_PREFIX/.pytest_cache
 rootdir: $REGENDOC_TMPDIR
-plugins: bug-0.4.0
+plugins: bug-x.y.z
 collected 7 items
 
 test_sample.py bfpbbfp
@@ -81,19 +81,19 @@ Symbols:
 $ pytest -v
 
 ======================== test session starts ========================
-platform linux -- Python 3.x.y, pytest-5.x.y, py-1.x.y, pluggy-0.x.y
+platform linux -- Python 3.x.y, pytest-x.y.z, py-x.y.z, pluggy-x.y.z
 cachedir: $PYTHON_PREFIX/.pytest_cache
 rootdir: $REGENDOC_TMPDIR
-plugins: bug-0.4.0
+plugins: bug-x.y.z
 collected 7 items
 
-test/test_one.py::test_one BUG-SKIP                          [ 14%]
-test/test_one.py::test_two BUG-FAIL                          [ 28%]
-test/test_one.py::test_three BUG-PASS                        [ 42%]
-test/test_one.py::TestFour::test_one BUG-SKIP                [ 57%]
-test/test_one.py::TestFour::test_two BUG-SKIP                [ 71%]
-test/test_one.py::TestFive::test_one BUG-FAIL                [ 85%]
-test/test_one.py::TestFive::test_two BUG-PASS                [100%]
+test_sample.py::test_one BUG-SKIP                          [ 14%]
+test_sample.py::test_two BUG-FAIL                          [ 28%]
+test_sample.py::test_three BUG-PASS                        [ 42%]
+test_sample.py::TestFour::test_one BUG-SKIP                [ 57%]
+test_sample.py::TestFour::test_two BUG-SKIP                [ 71%]
+test_sample.py::TestFive::test_one BUG-FAIL                [ 85%]
+test_sample.py::TestFive::test_two BUG-PASS                [100%]
 
 ---------- Bugs skipped: 3 Bugs passed: 2 Bugs failed: 2 ----------
 =================== 2 passed, 5 skipped in 0.10s ===================
