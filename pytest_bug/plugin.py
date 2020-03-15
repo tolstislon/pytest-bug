@@ -15,6 +15,13 @@ class MARKS(enum.Enum):
     UNKNOWN = 'u'
 
 
+verbose = {
+    MARKS.SKIP: 'BUG-SKIP',
+    MARKS.PASS: 'BUG-PASS',
+    MARKS.FAIL: 'BUG-FAIL'
+}
+
+
 def bug_mark(*args, run=False, **kwargs):
     comment = [str(i) for i in args]
     comment.extend(f'{key}={value}' for key, value in kwargs.items())
@@ -83,7 +90,8 @@ class PyTestBug:
         mark = getattr(report, BUG, None)
         if mark:
             self.counter(mark)
-            return report.outcome, mark.value, report.outcome.upper()
+            verb = verbose.get(mark, report.outcome.upper())
+            return report.outcome, mark.value, verb
 
     def pytest_terminal_summary(self, terminalreporter):
         text = []

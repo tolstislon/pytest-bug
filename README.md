@@ -6,6 +6,16 @@
 [![pytes_support](https://img.shields.io/badge/pytest-%3E%3D3.6.0-blue.svg)](https://pypi.org/project/pytest-bug/)
 [![Downloads](https://pepy.tech/badge/pytest-bug)](https://pypi.org/project/pytest-bug/)
 
+
+### Install
+
+```bash
+pip install pytest-bug
+```
+
+
+### Example
+
 ```python
 import pytest
 
@@ -45,16 +55,45 @@ class TestFive:
         assert True
 ```
 
-```
+```bash
 $ pytest
 
 ======================== test session starts ========================
 platform linux -- Python 3.x.y, pytest-5.x.y, py-1.x.y, pluggy-0.x.y
 cachedir: $PYTHON_PREFIX/.pytest_cache
 rootdir: $REGENDOC_TMPDIR
-collected 1 item
+plugins: bug-0.4.0
+collected 7 items
 
-test_sample.py bspbbsp
+test_sample.py bfpbbfp
+
+---------- Bugs skipped: 3 Bugs passed: 2 Bugs failed: 2 ----------
+=================== 2 passed, 5 skipped in 0.10s ===================
+```
+Symbols:
+* `b` - bug skip
+* `f` - bug fail
+* `p` - bug pass
+
+
+##### verbosity
+```bash
+$ pytest -v
+
+======================== test session starts ========================
+platform linux -- Python 3.x.y, pytest-5.x.y, py-1.x.y, pluggy-0.x.y
+cachedir: $PYTHON_PREFIX/.pytest_cache
+rootdir: $REGENDOC_TMPDIR
+plugins: bug-0.4.0
+collected 7 items
+
+test/test_one.py::test_one BUG-SKIP                          [ 14%]
+test/test_one.py::test_two BUG-FAIL                          [ 28%]
+test/test_one.py::test_three BUG-PASS                        [ 42%]
+test/test_one.py::TestFour::test_one BUG-SKIP                [ 57%]
+test/test_one.py::TestFour::test_two BUG-SKIP                [ 71%]
+test/test_one.py::TestFive::test_one BUG-FAIL                [ 85%]
+test/test_one.py::TestFive::test_two BUG-PASS                [100%]
 
 ---------- Bugs skipped: 3 Bugs passed: 2 Bugs failed: 2 ----------
 =================== 2 passed, 5 skipped in 0.10s ===================
