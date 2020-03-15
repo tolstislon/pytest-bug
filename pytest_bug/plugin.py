@@ -1,6 +1,7 @@
 import enum
 
 import pytest
+
 from . import hooks
 
 BUG = '_mark_bug'
@@ -15,9 +16,9 @@ class MARKS(enum.Enum):
 
 
 def bug_mark(*args, run=False, **kwargs):
-    com = [str(i) for i in args]
-    com.extend('%s=%s' % (key, value) for key, value in kwargs.items())
-    return ', '.join(com) if com else 'no comment', run
+    comment = [str(i) for i in args]
+    comment.extend(f'{key}={value}' for key, value in kwargs.items())
+    return ', '.join(comment) if comment else 'no comment', run
 
 
 class PyTestBug:
@@ -75,10 +76,8 @@ class PyTestBug:
                     self.set_mark(report, MARKS.PASS)
                 elif report.failed:
                     report.outcome = "skipped"
-                    eval_fail = getattr(item, "_evalxfail", None)
-                    if eval_fail is not None:
-                        report.wasxfail = eval_fail.getexplanation()
-                        self.set_mark(report, MARKS.FAIL)
+                    report.wasxfail = 'skipped'
+                    self.set_mark(report, MARKS.FAIL)
 
     def pytest_report_teststatus(self, report):
         mark = getattr(report, BUG, None)
@@ -89,10 +88,10 @@ class PyTestBug:
     def pytest_terminal_summary(self, terminalreporter):
         text = []
         if self._skipped:
-            text.append('Bugs skipped: %d' % self._skipped)
+            text.append(f'Bugs skipped: {self._skipped}')
         if self._passed:
-            text.append('Bugs passed: %d' % self._passed)
+            text.append(f'Bugs passed: {self._passed}')
         if self._failed:
-            text.append('Bugs failed: %d' % self._failed)
+            text.append(f'Bugs failed: {self._failed}')
         if text:
             terminalreporter.write_sep('-', ' '.join(text))

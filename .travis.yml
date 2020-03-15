@@ -4,7 +4,7 @@ language: python
 env:
   - $PYTEST_VERSION=3.6.0  # min version
   - $PYTEST_VERSION=4.6.9
-  - $PYTEST_VERSION=5.0.1
+  - $PYTEST_VERSION=5.3.5
   - $PYTEST_VERSION=5.4.1  # last version
 python:
   - "3.6"
@@ -20,7 +20,7 @@ deploy:
   provider: pypi
   user: $PYPI_USER
   password: $PYPI_PASSWORD
-  skip_existing: trueX
+  skip_existing: true
   on:
     tags: true
     python: "3.8"
