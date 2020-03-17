@@ -28,6 +28,7 @@ deploy:
   password: $PYPI_PASSWORD
   skip_existing: true
   skip_cleanup: true
+  distributions: "twine upload dist/*"
   on:
     tags: true
     repo: tolstislon/pytest-bug
