@@ -50,8 +50,7 @@ class PyTestBug:
 
     @staticmethod
     def set_comment(obj, comment):
-        if comment:
-            setattr(obj, COMMENT, 'BUG: %s' % str(comment))
+        setattr(obj, COMMENT, f'BUG: {comment}')
 
     @staticmethod
     def pytest_addhooks(pluginmanager):
@@ -75,7 +74,7 @@ class PyTestBug:
         report = outcome.get_result()
         mark = getattr(item, BUG, None)
         if mark:
-            self.set_comment(report, getattr(item, COMMENT))
+            setattr(report, COMMENT, getattr(item, COMMENT, ''))
             if report.skipped:
                 self.set_mark(report, MARKS.SKIP)
             if report.when == 'call':
