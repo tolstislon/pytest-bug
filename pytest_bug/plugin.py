@@ -94,12 +94,13 @@ class PyTestBug:
             return report.outcome, mark.value, verb
 
     def pytest_terminal_summary(self, terminalreporter):
-        text = []
-        if self._skipped:
-            text.append(f'Bugs skipped: {self._skipped}')
-        if self._passed:
-            text.append(f'Bugs passed: {self._passed}')
-        if self._failed:
-            text.append(f'Bugs failed: {self._failed}')
-        if text:
-            terminalreporter.write_sep('-', ' '.join(text))
+        if not self.config.getoption('--bug-no-stats') and self.config.getini('bug_summary_stats'):
+            text = []
+            if self._skipped:
+                text.append(f'Bugs skipped: {self._skipped}')
+            if self._passed:
+                text.append(f'Bugs passed: {self._passed}')
+            if self._failed:
+                text.append(f'Bugs failed: {self._failed}')
+            if text:
+                terminalreporter.write_sep('-', ' '.join(text))
