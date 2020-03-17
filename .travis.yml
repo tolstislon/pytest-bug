@@ -18,14 +18,16 @@ install:
   - pip install m2r==0.2.1
   - pip install twine==3.1.1
   - pip install pytest==$PYTEST_VERSION
-  - python setup.py bdist_wheel
+  - python setup.py install
 script:
+  - python setup.py bdist_wheel
   - pytest
 deploy:
   provider: pypi
   user: $PYPI_USER
   password: $PYPI_PASSWORD
   skip_existing: true
+  skip_cleanup: true
   on:
     tags: true
     repo: tolstislon/pytest-bug
