@@ -1,17 +1,21 @@
-from m2r import parse_from_file
-from setuptools import setup
-
+from setuptools import setup, find_packages
+from os import path
 import pytest_bug
+
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='pytest-bug',
     description=pytest_bug.__description__,
-    long_description=parse_from_file('README.md'),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     version=pytest_bug.__version__,
     author=pytest_bug.__author__,
     author_email=pytest_bug.__author_email__,
     url=pytest_bug.__url__,
-    packages=['pytest_bug'],
+    packages=find_packages(exclude=('tests',)),
     install_requires=['pytest>=3.6.0'],
     include_package_data=True,
     python_requires='>=3.6',
