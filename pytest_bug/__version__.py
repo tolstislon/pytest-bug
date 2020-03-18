@@ -1,4 +1,4 @@
-__version__ = '0.5.3'
+__version__ = '0.5.4'
 __url__ = 'https://github.com/tolstislon/pytest-bug'
 __description__ = 'Pytest plugin Mark test as a bug'
 __author__ = 'tolstislon'

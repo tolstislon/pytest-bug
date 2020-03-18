@@ -15,9 +15,10 @@ python:
   - "3.7"
   - "3.8"
 install:
-  - pip install pytest==$PYTEST_VERSION
-  - pip install pytest-cov==2.8.1
-  - python setup.py install
+  - pip install pipenv
+  - pipenv install pytest==$PYTEST_VERSION
+  - pipenv install pytest-cov==2.8.1
+  - pipenv install -e .
 script:
   - pytest ./tests
 deploy:
