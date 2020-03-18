@@ -3,7 +3,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pytest-bug.svg?color=yellow&label=version)](https://pypi.org/project/pytest-bug/)
 [![Build Status](https://travis-ci.com/tolstislon/pytest-bug.svg?branch=master)](https://travis-ci.com/tolstislon/pytest-bug)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytest-bug.svg)](https://pypi.org/project/pytest-bug/)
-[![pytes_support](https://img.shields.io/badge/pytest-%3E%3D3.6.0-blue.svg)](https://pypi.org/project/pytest-bug/)
+[![pytes_support](https://img.shields.io/badge/pytest-%3E%3D3.6.0-blue.svg)](https://github.com/pytest-dev/pytest/releases)
 [![Downloads](https://pepy.tech/badge/pytest-bug)](https://pypi.org/project/pytest-bug/)
 
 
