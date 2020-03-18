@@ -24,7 +24,7 @@ verbose = {
 
 def bug_mark(*args, run=False, **kwargs):
     comment = [str(i) for i in args]
-    comment.extend(f'{key}={value}' for key, value in kwargs.items())
+    comment.extend('{}={}'.format(key, value) for key, value in kwargs.items())
     return ', '.join(comment) if comment else 'no comment', run
 
 
@@ -50,7 +50,7 @@ class PyTestBug:
 
     @staticmethod
     def set_comment(obj, comment):
-        setattr(obj, COMMENT, f'BUG: {comment}')
+        setattr(obj, COMMENT, 'BUG: {}'.format(comment))
 
     @staticmethod
     def pytest_addhooks(pluginmanager):
@@ -96,10 +96,10 @@ class PyTestBug:
         if not self.config.getoption('--bug-no-stats') and self.config.getini('bug_summary_stats'):
             text = []
             if self._skipped:
-                text.append(f'Bugs skipped: {self._skipped}')
+                text.append('Bugs skipped: {}'.format(self._skipped))
             if self._passed:
-                text.append(f'Bugs passed: {self._passed}')
+                text.append('Bugs passed: {}'.format(self._passed))
             if self._failed:
-                text.append(f'Bugs failed: {self._failed}')
+                text.append('Bugs failed: {}'.format(self._failed))
             if text:
                 terminalreporter.write_sep('-', ' '.join(text))

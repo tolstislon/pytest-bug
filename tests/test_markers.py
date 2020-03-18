@@ -10,7 +10,7 @@ PARAMETRIZE = (('import pytest', 'pytest.mark.'), ('from pytest_bug import bug',
 @pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
 def test_mark_func_and_class(testdir, test_import, test_mark):
     testdir.makepyfile(
-        f"""
+        """
         {test_import}
 
         @{test_mark}bug('skip')
@@ -42,7 +42,7 @@ def test_mark_func_and_class(testdir, test_import, test_mark):
 
             def test_two(self):
                 assert True
-        """
+        """.format(test_import=test_import, test_mark=test_mark)
     )
     result = testdir.runpytest()
     assert result.ret == 0
@@ -55,7 +55,7 @@ def test_mark_func_and_class(testdir, test_import, test_mark):
 @pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
 def test_mark_module_no_run(testdir, test_import, test_mark):
     testdir.makepyfile(
-        f"""
+        """
         {test_import}
         
         pytestmark = {test_mark}bug('skip file')
@@ -65,7 +65,7 @@ def test_mark_module_no_run(testdir, test_import, test_mark):
         
         def test_two():
             assert True
-        """
+        """.format(test_import=test_import, test_mark=test_mark)
     )
     result = testdir.runpytest()
     assert result.ret == 0
@@ -78,7 +78,7 @@ def test_mark_module_no_run(testdir, test_import, test_mark):
 @pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
 def test_mark_module_run_true(testdir, test_import, test_mark):
     testdir.makepyfile(
-        f"""
+        """
         {test_import}
         
         pytestmark = {test_mark}bug('file bug', run=True)
@@ -88,7 +88,7 @@ def test_mark_module_run_true(testdir, test_import, test_mark):
         
         def test_two():
             assert True
-        """
+        """.format(test_import=test_import, test_mark=test_mark)
     )
     result = testdir.runpytest()
     assert result.ret == 0
