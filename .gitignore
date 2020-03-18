@@ -105,3 +105,4 @@ venv.bak/
 .idea/
 TODO.txt
 gfgfg.py
+.travis_dist.yml

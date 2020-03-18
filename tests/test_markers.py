@@ -8,7 +8,7 @@ PARAMETRIZE = (('import pytest', 'pytest.mark.'), ('from pytest_bug import bug',
 
 
 @pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
-def test_mark_tests_and_class(testdir, test_import, test_mark):
+def test_mark_func_and_class(testdir, test_import, test_mark):
     testdir.makepyfile(
         f"""
         {test_import}
