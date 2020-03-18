@@ -98,3 +98,9 @@ test_sample.py::TestFive::test_two BUG-PASS                [100%]
 ---------- Bugs skipped: 3 Bugs passed: 2 Bugs failed: 2 ----------
 =================== 2 passed, 5 skipped in 0.10s ===================
 ```
+
+Command line options:
+
+| option | description |
+| ------ | ------ |
+| --bug-no-stats | Disabling summary statistics |                                                             
