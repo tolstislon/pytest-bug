@@ -23,12 +23,6 @@ verbose = {
 }
 
 
-def bug_mark(*args, run=False, **kwargs):
-    comment = [str(i) for i in args]
-    comment.extend('{}={}'.format(key, value) for key, value in kwargs.items())
-    return ', '.join(comment) if comment else 'no comment', run
-
-
 class PyTestBug:
 
     def __init__(self, config):
@@ -36,6 +30,8 @@ class PyTestBug:
         self._skipped = 0
         self._failed = 0
         self._passed = 0
+        self._all_run = False
+        self._all_skip = False
 
     def _counter(self, mark):
         if mark is MARKS.SKIP:
@@ -44,6 +40,15 @@ class PyTestBug:
             self._failed += 1
         elif mark is MARKS.PASS:
             self._passed += 1
+
+    def _bug_mark(self, *args, run=False, **kwargs):
+        comment = [str(i) for i in args]
+        comment.extend('{}={}'.format(key, value) for key, value in kwargs.items())
+        if self._all_run:
+            run = True
+        elif self._all_skip:
+            run = False
+        return ', '.join(comment) if comment else 'no comment', run
 
     @staticmethod
     def _set_mark(obj, mark=MARKS.UNKNOWN):
@@ -58,9 +63,11 @@ class PyTestBug:
         pluginmanager.add_hookspecs(hooks)
 
     def pytest_collection_modifyitems(self, items, config):
+        self._all_run = config.getoption('--bug-all-run')
+        self._all_skip = config.getoption('--bug-all-skip')
         for item in items:
             for i in item.iter_markers(name='bug'):
-                comment, run = bug_mark(*i.args, **i.kwargs)
+                comment, run = self._bug_mark(*i.args, **i.kwargs)
                 self._set_comment(item, comment)
                 if run:
                     config.hook.pytest_bug_run_before_set_mark(item=item, config=config)

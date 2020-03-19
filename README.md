@@ -105,3 +105,5 @@ Command line options:
 | ------ | ------ |
 | --bug-no-stats | Disabling summary statistics |                 
 | --bug-pattern=REGEX | Run matching tests marked as bug |
+| --bug-all-run | Includes all bugs in the run |
+| --bug-all-skip | Disables all bugs in the run |
