@@ -82,4 +82,6 @@ def test_run_test_marked_as_bug(testdir):
     result = testdir.runpytest('-m bug')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'skipped': 1, 'deselected': 1}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 1
+    assert outcomes['skipped'] == 1

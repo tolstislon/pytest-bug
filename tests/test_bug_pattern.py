@@ -33,7 +33,8 @@ def test_search_start(testdir):
     result = testdir.runpytest(r'--bug-pattern=^C34\d')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 2, 'deselected': 4}
+    assert outcomes['passed'] == 2
+    assert outcomes['deselected'] == 4
 
 
 def test_search_word(testdir):
@@ -41,7 +42,8 @@ def test_search_word(testdir):
     result = testdir.runpytest(r'--bug-pattern=Invalid')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 2, 'deselected': 4}
+    assert outcomes['passed'] == 2
+    assert outcomes['deselected'] == 4
 
 
 def test_search_words(testdir):
@@ -49,7 +51,8 @@ def test_search_words(testdir):
     result = testdir.runpytest(r'--bug-pattern=Invalid type')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'deselected': 5}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 5
 
 
 def test_search_ignore_case(testdir):
@@ -57,7 +60,8 @@ def test_search_ignore_case(testdir):
     result = testdir.runpytest(r'--bug-pattern=invalid type')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'deselected': 5}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 5
 
 
 def test_search_ignore_case2(testdir):
@@ -65,7 +69,8 @@ def test_search_ignore_case2(testdir):
     result = testdir.runpytest(r'--bug-pattern=CrItIcAl bUg')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'deselected': 5}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 5
 
 
 def test_search_or(testdir):
@@ -73,7 +78,8 @@ def test_search_or(testdir):
     result = testdir.runpytest(r'--bug-pattern=(C345|C346)')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 2, 'deselected': 4}
+    assert outcomes['passed'] == 2
+    assert outcomes['deselected'] == 4
 
 
 def test_search_any(testdir):
@@ -81,7 +87,9 @@ def test_search_any(testdir):
     result = testdir.runpytest(r'--bug-pattern=.*')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 4, 'skipped': 1, 'deselected': 1}
+    assert outcomes['passed'] == 4
+    assert outcomes['deselected'] == 1
+    assert outcomes['skipped'] == 1
 
 
 def test_search_kwargs(testdir):
@@ -89,7 +97,8 @@ def test_search_kwargs(testdir):
     result = testdir.runpytest(r'--bug-pattern=issue=476')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'deselected': 5}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 5
 
 
 def test_search_int(testdir):
@@ -97,4 +106,5 @@ def test_search_int(testdir):
     result = testdir.runpytest(r'--bug-pattern=2671')
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes == {'passed': 1, 'deselected': 5}
+    assert outcomes['passed'] == 1
+    assert outcomes['deselected'] == 5
