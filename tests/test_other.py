@@ -60,3 +60,26 @@ def test_report_item(testdir):
     )
     result = testdir.runpytest()
     assert result.ret == 0
+
+
+def test_run_test_marked_as_bug(testdir):
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug('test', run=True)
+        def test_one():
+            assert True
+
+        @pytest.mark.bug('test')
+        def test_two():
+            assert False
+
+        def test_three():
+            assert False
+        """
+    )
+    result = testdir.runpytest('-m bug')
+    assert result.ret == 0
+    outcomes = result.parseoutcomes()
+    assert outcomes == {'passed': 1, 'skipped': 1, 'deselected': 1}

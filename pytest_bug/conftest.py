@@ -5,6 +5,7 @@ def pytest_addoption(parser):
     bug = parser.getgroup('pytest-bug')
     bug.addoption('--bug-no-stats', action='store_true', help='Disabling summary statistics', default=False)
     parser.addini('bug_summary_stats', help='Display summary statistics', default=True, type="bool")
+    bug.addoption("--bug-pattern", action="store", metavar="REGEX", help="Run matching tests marked as bug", type=str)
 
 
 def pytest_configure(config):

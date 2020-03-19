@@ -20,38 +20,38 @@ pip install pytest-bug
 import pytest
 
 
-@pytest.mark.bug('skip')
+@pytest.mark.bug('C18', 'Critical bug')  # mark skip test
 def test_one():
     assert False
 
 
-@pytest.mark.bug('fail', run=True)
+@pytest.mark.bug('C39', 'Minor bug', run=True)  # mark xfail test if fail else pass
 def test_two():
     assert False
 
 
-@pytest.mark.bug('pass', run=True)
+@pytest.mark.bug('C41', 'Minor bug', run=True)
 def test_three():
     assert True
 
 
-@pytest.mark.bug('skip class')
+@pytest.mark.bug('Bug all test')
 class TestFour:
 
-    def test_one(self):
+    def test_one(self):   # mark skip test
         assert False
 
-    def test_two(self):
+    def test_two(self):    # mark skip test
         assert True
 
 
-@pytest.mark.bug('class', run=True)
+@pytest.mark.bug('Unstable tests', run=True)
 class TestFive:
 
-    def test_one(self):
+    def test_one(self): # mark xfail
         assert False
 
-    def test_two(self):
+    def test_two(self): # pass
         assert True
 ```
 
@@ -103,4 +103,5 @@ Command line options:
 
 | option | description |
 | ------ | ------ |
-| --bug-no-stats | Disabling summary statistics |                                                             
+| --bug-no-stats | Disabling summary statistics |                 
+| --bug-pattern=REGEX | Run matching tests marked as bug |
