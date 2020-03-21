@@ -7,9 +7,8 @@ def test_item_attr(testdir):
     testdir.makeconftest(
         """        
         def pytest_runtest_makereport(item):
-            assert hasattr(item, '_mark_bug')
-            assert hasattr(item, '_bug_comment') 
-            assert item._bug_comment == 'BUG: test'
+            mark_bug = item._mark_bug
+            assert mark_bug.comment == 'BUG: test'
         """
     )
     testdir.makepyfile(
@@ -33,14 +32,42 @@ def test_item_attr(testdir):
     assert result.ret == 0
 
 
+def test_item_attr_no_comment(testdir):
+    testdir.makeconftest(
+        """        
+        def pytest_runtest_makereport(item):
+            mark_bug = item._mark_bug
+            assert mark_bug.comment == 'BUG: no comment'
+        """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug(run=True)
+        def test_one():
+            assert True
+
+        @pytest.mark.bug
+        def test_two():
+            assert False
+
+        @pytest.mark.bug(run=True)
+        def test_three():
+            assert False
+        """
+    )
+    result = testdir.runpytest()
+    assert result.ret == 0
+
+
 def test_report_item(testdir):
     testdir.makeconftest(
         """
         def pytest_runtest_logreport(report):
             if report.when == 'call':
-                assert hasattr(report, '_mark_bug')
-                assert hasattr(report, '_bug_comment')
-                assert report._bug_comment == 'BUG: test'
+                mark_bug = report._mark_bug
+                assert mark_bug.comment == 'BUG: test'
         """
     )
     testdir.makepyfile(
@@ -57,6 +84,40 @@ def test_report_item(testdir):
 
         @pytest.mark.bug('test', run=True)
         def test_three():
+            assert False
+        """
+    )
+    result = testdir.runpytest()
+    assert result.ret == 0
+
+
+def test_report_item_no_comment(testdir):
+    testdir.makeconftest(
+        """
+        def pytest_runtest_logreport(report):
+            if report.when == 'call':
+                mark_bug = report._mark_bug
+                assert mark_bug.comment == 'BUG: no comment'
+        """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug(run=True)
+        def test_one():
+            assert True
+
+        @pytest.mark.bug
+        def test_two():
+            assert False
+
+        @pytest.mark.bug(run=True)
+        def test_three():
+            assert False
+            
+        @pytest.mark.bug(run=False)
+        def test_four():
             assert False
         """
     )

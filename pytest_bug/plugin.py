@@ -1,26 +1,91 @@
-import enum
 import re
+from abc import ABCMeta
 
 import pytest
 
 from . import hooks
 
-BUG = '_mark_bug'
-COMMENT = '_bug_comment'
+MARK_BUG = '_mark_bug'
 
 
-class MARKS(enum.Enum):
-    SKIP = 'b'
-    FAIL = 'f'
-    PASS = 'p'
-    UNKNOWN = 'u'
+class MarkBug:
+    def __init__(self, comment='no comment', run=False):
+        self.comment = 'BUG: {}'.format(comment)
+        self.run = run
 
 
-verbose = {
-    MARKS.SKIP: 'BUG-SKIP',
-    MARKS.PASS: 'BUG-PASS',
-    MARKS.FAIL: 'BUG-FAIL'
-}
+class ReportBug(metaclass=ABCMeta):
+    letter = 'u'
+    word = 'BUG-UNKNOWN'
+    markup = {}
+
+    def __init__(self, comment):
+        self.comment = comment
+
+
+class SkipBug(ReportBug):
+    letter = 'b'
+    word = 'BUG-SKIP'
+    markup = {"yellow": True}
+
+
+class FailBug(ReportBug):
+    letter = 'f'
+    word = 'BUG-FAIL'
+    markup = {"red": True}
+
+
+class PassBug(ReportBug):
+    letter = 'p'
+    word = 'BUG-PASS'
+    markup = {"green": True}
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup('pytest-bug')
+    group.addoption(
+        '--bug-no-stats',
+        action='store_true',
+        help='Disabling summary statistics',
+        default=False
+    )
+    group.addoption(
+        '--bug-pattern',
+        action="store",
+        metavar="REGEX",
+        help="Run matching tests marked as bug",
+        type=str
+    )
+    group.addoption(
+        '--bug-all-run',
+        action='store_true',
+        help='Includes all bugs in the run',
+        default=False
+    )
+    group.addoption(
+        '--bug-all-skip',
+        action='store_true',
+        help='Disables all bugs in the run',
+        default=False
+    )
+
+    # add ini params
+    parser.addini(
+        'bug_summary_stats',
+        help='Display summary statistics',
+        default=True,
+        type="bool"
+    )
+
+
+def pytest_addhooks(pluginmanager):
+    pluginmanager.add_hookspecs(hooks)
+
+
+def pytest_configure(config):
+    config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
+    config._bug = PyTestBug(config)
+    config.pluginmanager.register(config._bug)
 
 
 class PyTestBug:
@@ -30,15 +95,15 @@ class PyTestBug:
         self._skipped = 0
         self._failed = 0
         self._passed = 0
-        self._all_run = False
-        self._all_skip = False
+        self._all_run = config.getoption('--bug-all-run')
+        self._all_skip = config.getoption('--bug-all-skip')
 
     def _counter(self, mark):
-        if mark is MARKS.SKIP:
+        if isinstance(mark, SkipBug):
             self._skipped += 1
-        elif mark is MARKS.FAIL:
+        elif isinstance(mark, FailBug):
             self._failed += 1
-        elif mark is MARKS.PASS:
+        elif isinstance(mark, PassBug):
             self._passed += 1
 
     def _bug_mark(self, *args, run=False, **kwargs):
@@ -50,72 +115,54 @@ class PyTestBug:
             run = False
         return ', '.join(comment) if comment else 'no comment', run
 
-    @staticmethod
-    def _set_mark(obj, mark=MARKS.UNKNOWN):
-        setattr(obj, BUG, mark)
-
-    @staticmethod
-    def _set_comment(obj, comment):
-        setattr(obj, COMMENT, 'BUG: {}'.format(comment))
-
-    @staticmethod
-    def pytest_addhooks(pluginmanager):
-        pluginmanager.add_hookspecs(hooks)
-
     def pytest_collection_modifyitems(self, items, config):
-        self._all_run = config.getoption('--bug-all-run')
-        self._all_skip = config.getoption('--bug-all-skip')
         for item in items:
             for i in item.iter_markers(name='bug'):
                 comment, run = self._bug_mark(*i.args, **i.kwargs)
-                self._set_comment(item, comment)
-                if run:
-                    config.hook.pytest_bug_run_before_set_mark(item=item, config=config)
-                    self._set_mark(item)
-                    config.hook.pytest_bug_run_after_set_mark(item=item, config=config)
-                else:
-                    self._set_mark(item, MARKS.SKIP)
+                mark_bug = MarkBug(comment, run)
+                config.hook.pytest_bug_item_mark(mark_bug=mark_bug, config=config)
+                setattr(item, MARK_BUG, mark_bug)
 
         bug_pattern = config.getoption('--bug-pattern')
         if bug_pattern:
             selected_items = []
             for item in items:
-                if hasattr(item, COMMENT):
-                    comment = getattr(item, COMMENT)[5:]
+                mark_bug = getattr(item, MARK_BUG, None)
+                if mark_bug is not None:
+                    comment = mark_bug.comment[5:]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
             deselected_items = [i for i in items if i not in selected_items]
             config.hook.pytest_deselected(items=deselected_items)
             items[:] = selected_items
 
-    def pytest_runtest_setup(self, item):
-        mark = getattr(item, BUG, None)
-        if mark and mark is MARKS.SKIP:
-            pytest.skip(getattr(item, COMMENT, ''))
+    @staticmethod
+    def pytest_runtest_setup(item):
+        mark_bug = getattr(item, MARK_BUG, None)
+        if isinstance(mark_bug, MarkBug) and mark_bug.run is False:
+            pytest.skip(mark_bug.comment)
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)
     def pytest_runtest_makereport(self, item):
         outcome = yield
         report = outcome.get_result()
-        mark = getattr(item, BUG, None)
-        if mark:
-            setattr(report, COMMENT, getattr(item, COMMENT, ''))
+        mark_bug = getattr(item, MARK_BUG, None)
+        if isinstance(mark_bug, MarkBug):
             if report.skipped:
-                self._set_mark(report, MARKS.SKIP)
-            if report.when == 'call':
+                setattr(report, MARK_BUG, SkipBug(mark_bug.comment))
+            elif report.when == 'call':
                 if report.passed:
-                    self._set_mark(report, MARKS.PASS)
+                    setattr(report, MARK_BUG, PassBug(mark_bug.comment))
                 elif report.failed:
                     report.outcome = "skipped"
                     report.wasxfail = 'skipped'
-                    self._set_mark(report, MARKS.FAIL)
+                    setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
     def pytest_report_teststatus(self, report):
-        mark = getattr(report, BUG, None)
-        if mark:
-            self._counter(mark)
-            verb = verbose.get(mark, report.outcome.upper())
-            return report.outcome, mark.value, verb
+        mark_bug = getattr(report, MARK_BUG, None)
+        if isinstance(mark_bug, ReportBug):
+            self._counter(mark_bug)
+            return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
 
     def pytest_terminal_summary(self, terminalreporter):
         if not self.config.getoption('--bug-no-stats') and self.config.getini('bug_summary_stats'):

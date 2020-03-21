@@ -1,13 +1,6 @@
 import pytest
 
-from .__version__ import (
-    __version__,
-    __author__,
-    __author_email__,
-    __description__,
-    __license__,
-    __url__
-)
+__version__ = '0.7.2'
 
 
 def bug(*args, run=False):
@@ -16,10 +9,5 @@ def bug(*args, run=False):
 
 __all__ = [
     '__version__',
-    '__author__',
-    '__author_email__',
-    '__description__',
-    '__license__',
-    '__url__',
     'bug'
 ]

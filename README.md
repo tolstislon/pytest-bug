@@ -35,7 +35,7 @@ def test_three():
     assert True
 
 
-@pytest.mark.bug('Bug all test')
+@pytest.mark.bug('Bug all tests')
 class TestFour:
 
     def test_one(self):   # mark skip test
