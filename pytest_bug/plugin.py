@@ -53,8 +53,7 @@ def pytest_addoption(parser):
         '--bug-pattern',
         action="store",
         metavar="REGEX",
-        help="Run matching tests marked as bug",
-        type=str
+        help="Run matching tests marked as bug"
     )
     group.addoption(
         '--bug-all-run',
@@ -68,6 +67,42 @@ def pytest_addoption(parser):
         help='Disables all bugs in the run',
         default=False
     )
+    group.addoption(
+        '--bug-skip-letter',
+        action="store",
+        metavar="LETTER",
+        help="Set to output in console for skip-bug (default: b)",
+    )
+    group.addoption(
+        '--bug-skip-word',
+        action="store",
+        metavar="WORLD",
+        help="Set to output in console for skip-bug verbosity (default: BUG-SKIP)",
+    )
+    group.addoption(
+        '--bug-fail-letter',
+        action="store",
+        metavar="LETTER",
+        help="Set to output in console for fail-bug (default: f)",
+    )
+    group.addoption(
+        '--bug-fail-word',
+        action="store",
+        metavar="WORLD",
+        help="Set to output in console for fail-bug verbosity (default: BUG-FAIL)",
+    )
+    group.addoption(
+        '--bug-pass-letter',
+        action="store",
+        metavar="LETTER",
+        help="Set to output in console for pass-bug (default: p)",
+    )
+    group.addoption(
+        '--bug-pass-word',
+        action="store",
+        metavar="WORLD",
+        help="Set to output in console for fail-bug verbosity (default: BUG-PASS)",
+    )
 
     # add ini params
     parser.addini(
@@ -76,6 +111,30 @@ def pytest_addoption(parser):
         default=True,
         type="bool"
     )
+    parser.addini(
+        'bug_skip_letter',
+        help='Set to output in console for skip-bug (default: b)',
+    )
+    parser.addini(
+        'bug_skip_word',
+        help='Set to output in console for skip-bug verbosity (default: BUG-SKIP)',
+    )
+    parser.addini(
+        'bug_fail_letter',
+        help='Set to output in console for fail-bug (default: f)',
+    )
+    parser.addini(
+        'bug_fail_word',
+        help='Set to output in console for fail-bug verbosity (default: BUG-FAIL)',
+    )
+    parser.addini(
+        'bug_pass_letter',
+        help='Set to output in console for pass-bug (default: p)',
+    )
+    parser.addini(
+        'bug_pass_word',
+        help='Set to output in console for fail-bug verbosity (default: BUG-PASS)',
+    )
 
 
 def pytest_addhooks(pluginmanager):
@@ -83,7 +142,6 @@ def pytest_addhooks(pluginmanager):
 
 
 def pytest_configure(config):
-    config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
     config._bug = PyTestBug(config)
     config.pluginmanager.register(config._bug)
 
@@ -114,6 +172,27 @@ class PyTestBug:
         elif self._all_skip:
             run = False
         return ', '.join(comment) if comment else 'no comment', run
+
+    def pytest_configure(self, config):
+        config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
+        letter_skip = config.getoption('--bug-skip-letter') or config.getini('bug_skip_letter')
+        if letter_skip:
+            SkipBug.letter = letter_skip
+        word_skip = config.getoption('--bug-skip-word') or config.getini('bug_skip_word')
+        if word_skip:
+            SkipBug.word = word_skip
+        letter_fail = config.getoption('--bug-fail-letter') or config.getini('bug_fail_letter')
+        if letter_fail:
+            FailBug.letter = letter_fail
+        word_fail = config.getoption('--bug-fail-word') or config.getini('bug_fail_word')
+        if word_fail:
+            FailBug.word = word_fail
+        letter_pass = config.getoption('--bug-pass-letter') or config.getini('bug_pass_letter')
+        if letter_pass:
+            PassBug.letter = letter_pass
+        word_pass = config.getoption('--bug-pass-word') or config.getini('bug_pass_word')
+        if word_pass:
+            PassBug.word = word_pass
 
     def pytest_collection_modifyitems(self, items, config):
         for item in items:

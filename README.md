@@ -99,11 +99,17 @@ test_sample.py::TestFive::test_two BUG-PASS                [100%]
 =================== 2 passed, 5 skipped in 0.10s ===================
 ```
 
-Command line options:
+Options:
 
-| option | description |
-| ------ | ------ |
-| --bug-no-stats | Disabling summary statistics |                 
-| --bug-pattern=REGEX | Run matching tests marked as bug |
-| --bug-all-run | Includes all bugs in the run |
-| --bug-all-skip | Disables all bugs in the run |
+| option | description | config |
+| ------ | ------ | ------ |
+| --bug-no-stats | Disabling summary statistics | bug_summary_stats (bool) |                
+| --bug-pattern=REGEX | Run matching tests marked as bug | - |
+| --bug-all-run | Includes all bugs in the run | - |
+| --bug-all-skip | Disables all bugs in the run | - |
+| --bug-skip-letter=LETTER | Set to output in console for skip-bug (default: b) | bug_skip_letter (string) |
+| --bug-fail-letter=LETTER | Set to output in console for fail-bug (default: f) | bug_fail_letter (string) |
+| --bug-pass-letter=LETTER | Set to output in console for pass-bug (default: p) | bug_pass_letter (string) |
+| --bug-skip-word=WORLD | Set to output in console for skip-bug verbosity (default: BUG-SKIP) | bug_skip_word (string) |
+| --bug-fail-word=WORLD | Set to output in console for fail-bug verbosity (default: BUG-FAIL) | bug_fail_word (string) |
+| --bug-pass-word=WORLD | Set to output in console for fail-bug verbosity (default: BUG-PASS) | bug_pass_word (string) |
