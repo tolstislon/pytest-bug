@@ -1,6 +1,6 @@
 import pytest
 
-__version__ = '0.7.3'
+__version__ = '0.7.5'
 
 
 def bug(*args, run=False):

@@ -194,3 +194,101 @@ def test_skip_all_bugs(testdir):
     result.assert_outcomes(skipped=2, failed=1)
     stdout = result.stdout.str()
     assert re.search(r'-\sBugs skipped: 2\s-', stdout)
+
+
+def test_two_marks_comment(testdir):
+    testdir.makeconftest(
+        """        
+        def pytest_runtest_makereport(item):
+            mark_bug = item._mark_bug
+            assert mark_bug.comment == 'BUG: one, two'
+        """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug('two', run=True)
+        @pytest.mark.bug('one', run=True)
+        def test_one():
+            assert True
+
+        @pytest.mark.bug('two')
+        @pytest.mark.bug('one')
+        def test_two():
+            assert False
+
+        @pytest.mark.bug('two', run=True)
+        @pytest.mark.bug('one', run=True)
+        def test_three():
+            assert False
+        """
+    )
+    result = testdir.runpytest()
+    assert result.ret == 0
+
+
+def test_several_marks_comment(testdir):
+    testdir.makeconftest(
+        """        
+        def pytest_runtest_makereport(item):
+            mark_bug = item._mark_bug
+            assert mark_bug.comment == 'BUG: bug1, bug2, bug3, bug4, bug5, bug6'
+        """
+    )
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug('bug6', run=True)
+        @pytest.mark.bug('bug5', run=True)
+        @pytest.mark.bug('bug4', run=True)
+        @pytest.mark.bug('bug3', run=True)
+        @pytest.mark.bug('bug2', run=True)
+        @pytest.mark.bug('bug1', run=True)
+        def test_one():
+            assert True
+        """
+    )
+    result = testdir.runpytest()
+    assert result.ret == 0
+
+
+def test_two_marks_run(testdir):
+    testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.bug('two', run=True)
+        @pytest.mark.bug('one', run=True)
+        def test_one():
+            assert True
+
+        @pytest.mark.bug('two')
+        @pytest.mark.bug('one')
+        def test_two():
+            assert False
+
+        @pytest.mark.bug('two', run=True)
+        @pytest.mark.bug('one')
+        def test_three():
+            assert False
+            
+        @pytest.mark.bug('two', run=False)
+        @pytest.mark.bug('one', run=True)
+        def test_four():
+            assert False
+            
+            
+        @pytest.mark.bug
+        @pytest.mark.bug('one', run=True)
+        def test_five():
+            assert False
+        """
+    )
+    result = testdir.runpytest()
+    assert result.ret == 0
+    result.assert_outcomes(skipped=4, passed=1)
+    stdout = result.stdout.str()
+    assert re.search(r'\w+\.py pbbbb', stdout)
+    assert re.search(r'-\sBugs skipped: 4 Bugs passed: 1\s-', stdout)

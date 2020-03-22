@@ -1,5 +1,4 @@
 import re
-from abc import ABCMeta
 
 import pytest
 
@@ -14,7 +13,7 @@ class MarkBug:
         self.run = run
 
 
-class ReportBug(metaclass=ABCMeta):
+class ReportBug:
     letter = 'u'
     word = 'BUG-UNKNOWN'
     markup = {}
@@ -173,7 +172,8 @@ class PyTestBug:
             run = False
         return ', '.join(comment) if comment else 'no comment', run
 
-    def pytest_configure(self, config):
+    @staticmethod
+    def pytest_configure(config):
         config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
         letter_skip = config.getoption('--bug-skip-letter') or config.getini('bug_skip_letter')
         if letter_skip:
@@ -196,9 +196,15 @@ class PyTestBug:
 
     def pytest_collection_modifyitems(self, items, config):
         for item in items:
-            for i in item.iter_markers(name='bug'):
-                comment, run = self._bug_mark(*i.args, **i.kwargs)
-                mark_bug = MarkBug(comment, run)
+            bug_markers = tuple(item.iter_markers(name='bug'))
+            if bug_markers:
+                runs = []
+                comments = []
+                for i in bug_markers:
+                    comment, run = self._bug_mark(*i.args, **i.kwargs)
+                    runs.append(run)
+                    comments.append(comment)
+                mark_bug = MarkBug(comment=', '.join(comments), run=all(runs))
                 config.hook.pytest_bug_item_mark(mark_bug=mark_bug, config=config)
                 setattr(item, MARK_BUG, mark_bug)
 
@@ -211,8 +217,7 @@ class PyTestBug:
                     comment = mark_bug.comment[5:]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
-            deselected_items = [i for i in items if i not in selected_items]
-            config.hook.pytest_deselected(items=deselected_items)
+            config.hook.pytest_deselected(items=[i for i in items if i not in selected_items])
             items[:] = selected_items
 
     @staticmethod
@@ -241,6 +246,7 @@ class PyTestBug:
         mark_bug = getattr(report, MARK_BUG, None)
         if isinstance(mark_bug, ReportBug):
             self._counter(mark_bug)
+            self.config.hook.pytest_bug_report_teststatus(report=report, report_bug=mark_bug)
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
 
     def pytest_terminal_summary(self, terminalreporter):
