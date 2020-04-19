@@ -5,6 +5,7 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytest-bug.svg)](https://pypi.org/project/pytest-bug/)
 [![pytes_support](https://img.shields.io/badge/pytest-%3E%3D3.6.0-blue.svg)](https://github.com/pytest-dev/pytest/releases)
 [![Downloads](https://pepy.tech/badge/pytest-bug)](https://pypi.org/project/pytest-bug/)
+[![codecov](https://codecov.io/gh/tolstislon/pytest-bug/branch/master/graph/badge.svg)](https://codecov.io/gh/tolstislon/pytest-bug)
 
 
 ### Install

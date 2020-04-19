@@ -1,4 +1,5 @@
 import re
+from typing import Dict, Tuple
 
 import pytest
 
@@ -9,7 +10,7 @@ START_COMMENT = "BUG: "
 
 
 class MarkBug:
-    def __init__(self, comment="no comment", run=False):
+    def __init__(self, comment: str = "no comment", run: bool = False):
         """
         :param comment: str
         :param run: bool
@@ -19,9 +20,9 @@ class MarkBug:
 
 
 class ReportBug:
-    letter = "u"
-    word = "BUG-UNKNOWN"
-    markup = {}
+    letter = "u"  # type: str
+    word = "BUG-UNKNOWN"  # type:str
+    markup = {}  # type: Dict[str, bool]
 
     def __init__(self, comment):
         self.comment = comment
@@ -157,7 +158,7 @@ class PyTestBug:
         self._all_run = config.getoption("--bug-all-run")
         self._all_skip = config.getoption("--bug-all-skip")
 
-    def _counter(self, mark):
+    def _counter(self, mark: ReportBug) -> None:
         """
         :param mark: Sub object ReportBug
         """
@@ -168,7 +169,7 @@ class PyTestBug:
         elif isinstance(mark, PassBug):
             self._passed += 1
 
-    def _bug_mark(self, *args, run=False, **kwargs):
+    def _bug_mark(self, *args, run: bool = False, **kwargs) -> Tuple[str, bool]:
         """
         :param run: bool
         :return: Tuple[str, bool]
@@ -274,8 +275,9 @@ class PyTestBug:
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
 
     def pytest_terminal_summary(self, terminalreporter):
-        if (not self.config.getoption("--bug-no-stats") and
-                self.config.getini("bug_summary_stats")):
+        if not self.config.getoption("--bug-no-stats") and self.config.getini(
+                "bug_summary_stats"
+        ):
             text = []
             if self._skipped:
                 text.append("Bugs skipped: {}".format(self._skipped))
