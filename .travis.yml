@@ -10,6 +10,9 @@ env:
 git:
   depth: false
 
+git:
+  depth: false
+
 python:
   - "pypy3"
   - "3.5"
@@ -33,6 +36,10 @@ deploy:
     repo: tolstislon/pytest-bug
     python: "3.8"
     condition: $PYTEST_VERSION == "-U pytest"
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
