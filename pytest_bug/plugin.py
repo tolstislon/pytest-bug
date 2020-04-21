@@ -227,8 +227,9 @@ class PyTestBug:
                     runs.append(run)
                     comments.append(comment)
                 mark_bug = MarkBug(comment=", ".join(comments), run=all(runs))
-                config.hook.pytest_bug_item_mark(mark_bug=mark_bug, config=config)
+                config.hook.pytest_bug_set_mark(mark_bug=mark_bug, config=config)
                 setattr(item, MARK_BUG, mark_bug)
+                config.hook.pytest_bug_item_mark(item=item, config=config)
 
         bug_pattern = config.getoption("--bug-pattern")
         if bug_pattern:

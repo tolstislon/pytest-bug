@@ -3,12 +3,12 @@ import re
 pytest_plugins = ("pytester",)
 
 
-def test_pytest_bug_item_mark(testdir):
+def test_pytest_bug_set_mark(testdir):
     testdir.makeconftest(
         """
         import pytest
         
-        def pytest_bug_item_mark(mark_bug, config):
+        def pytest_bug_set_mark(mark_bug, config):
             mark_bug.comment = mark_bug.comment.replace('BUG', 'FEATURE')
             mark_bug.run = True
             

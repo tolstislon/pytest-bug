@@ -1,10 +1,18 @@
 """Plugin hooks"""
 
 
-def pytest_bug_item_mark(mark_bug, config):  # noqa
+def pytest_bug_set_mark(mark_bug, config):  # noqa
     """
     Called set mark
     :param mark_bug: MarkBug
+    :param config: Base pytest config
+    """
+
+
+def pytest_bug_item_mark(item, config):
+    """
+    Called after set mark
+    :param item: pytest item
     :param config: Base pytest config
     """
 
