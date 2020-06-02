@@ -4,9 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-pytest = "==5.4.1"
-pytest-cov = "==2.8.1"
-black = "*"
+pytest = "==5.4.2"
+pytest-cov = "==2.9.0"
+black = "==19.10b0"
 
 [packages]
 

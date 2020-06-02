@@ -1,7 +1,7 @@
 """Plugin hooks"""
 
 
-def pytest_bug_set_mark(mark_bug, config):  # noqa
+def pytest_bug_set_mark(mark_bug, config):  # pragma: no cover
     """
     Called set mark
     :param mark_bug: MarkBug
@@ -9,7 +9,7 @@ def pytest_bug_set_mark(mark_bug, config):  # noqa
     """
 
 
-def pytest_bug_item_mark(item, config):
+def pytest_bug_item_mark(item, config):  # pragma: no cover
     """
     Called after set mark
     :param item: pytest item
@@ -17,7 +17,7 @@ def pytest_bug_item_mark(item, config):
     """
 
 
-def pytest_bug_report_teststatus(report, report_bug):  # noqa
+def pytest_bug_report_teststatus(report, report_bug):  # pragma: no cover
     """
     Called before output
     :param report: Base pytest report
