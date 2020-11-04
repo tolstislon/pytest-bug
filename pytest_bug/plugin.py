@@ -117,21 +117,24 @@ def pytest_addoption(parser):
         type="bool",
     )
     parser.addini(
-        "bug_skip_letter", help="Set to output in console for skip-bug (default: b)",
+        "bug_skip_letter",
+        help="Set to output in console for skip-bug (default: b)",
     )
     parser.addini(
         "bug_skip_word",
         help="Set to output in console for skip-bug verbosity (default: BUG-SKIP)",
     )
     parser.addini(
-        "bug_fail_letter", help="Set to output in console for fail-bug (default: f)",
+        "bug_fail_letter",
+        help="Set to output in console for fail-bug (default: f)",
     )
     parser.addini(
         "bug_fail_word",
         help="Set to output in console for fail-bug verbosity (default: BUG-FAIL)",
     )
     parser.addini(
-        "bug_pass_letter", help="Set to output in console for pass-bug (default: p)",
+        "bug_pass_letter",
+        help="Set to output in console for pass-bug (default: p)",
     )
     parser.addini(
         "bug_pass_word",
@@ -277,7 +280,7 @@ class PyTestBug:
 
     def pytest_terminal_summary(self, terminalreporter):
         if not self.config.getoption("--bug-no-stats") and self.config.getini(
-                "bug_summary_stats"
+            "bug_summary_stats"
         ):
             text = []
             if self._skipped:

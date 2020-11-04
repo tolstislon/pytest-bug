@@ -22,22 +22,22 @@ pip install pytest-bug
 import pytest
 
 
-@pytest.mark.bug('C18', 'Critical bug')  # mark skip test
+@pytest.mark.bug("C18", "Critical bug")  # mark skip test
 def test_one():
     assert False
 
 
-@pytest.mark.bug('C39', 'Minor bug', run=True)  # mark xfail test if fail else pass
+@pytest.mark.bug("C39", "Minor bug", run=True)  # mark xfail test if fail else pass
 def test_two():
     assert False
 
 
-@pytest.mark.bug('C41', 'Minor bug', run=True)
+@pytest.mark.bug("C41", "Minor bug", run=True)
 def test_three():
     assert True
 
 
-@pytest.mark.bug('Bug all tests')
+@pytest.mark.bug("Bug all tests")
 class TestFour:
 
     def test_one(self):   # mark skip test
@@ -47,7 +47,7 @@ class TestFour:
         assert True
 
 
-@pytest.mark.bug('Unstable tests', run=True)
+@pytest.mark.bug("Unstable tests", run=True)
 class TestFive:
 
     def test_one(self): # mark xfail

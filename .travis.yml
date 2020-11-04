@@ -1,10 +1,10 @@
-dist: bionic
+dist: focal
 language: python
 
 env:
   - PYTEST_VERSION="pytest==3.6.0"  # min support version
   - PYTEST_VERSION="pytest==4.6.9"
-  - PYTEST_VERSION="pytest==5.3.5"
+  - PYTEST_VERSION="pytest==5.4.3"
   - PYTEST_VERSION="-U pytest"
 
 git:
@@ -16,10 +16,10 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-  - "3.9-dev"
+  - "3.9"
 install:
   - pip install $PYTEST_VERSION
-  - pip install pytest-cov==2.9.0
+  - pip install pytest-cov==2.10.1
   - pip install -e .
 script:
   - pytest ./tests
