@@ -31,7 +31,7 @@ jobs:
           python -m pip install -e .
       - name: Black
         run: |
-          black --check testrail_api
+          black --check pytest_bug
       - name: Test with pytest
         run: |
           pytest tests

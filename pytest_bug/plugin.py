@@ -240,7 +240,7 @@ class PyTestBug:
             for item in items:
                 mark_bug = getattr(item, MARK_BUG, None)
                 if mark_bug is not None:
-                    comment = mark_bug.comment[len(START_COMMENT):]
+                    comment = mark_bug.comment[len(START_COMMENT) :]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
             config.hook.pytest_deselected(
@@ -280,7 +280,7 @@ class PyTestBug:
 
     def pytest_terminal_summary(self, terminalreporter):
         if not self.config.getoption("--bug-no-stats") and self.config.getini(
-                "bug_summary_stats"
+            "bug_summary_stats"
         ):
             text = []
             if self._skipped:
