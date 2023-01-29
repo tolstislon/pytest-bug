@@ -1,12 +1,24 @@
 import re
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 import pytest
+from _pytest.config import Config, PytestPluginManager
+from _pytest.config.argparsing import Parser
+from _pytest.python import Function
+from _pytest.reports import TestReport
+from _pytest.terminal import TerminalReporter
 
 from . import hooks
 
 MARK_BUG = "_mark_bug"
 START_COMMENT = "BUG: "
+ORT_GROUP = "pytest-bug"
+
+
+class Metavar:
+    LETTER = "LETTER"
+    WORLD = "WORLD"
+    REGEX = "REGEX"
 
 
 class MarkBug:
@@ -46,18 +58,33 @@ class PassBug(ReportBug):
     markup = {"green": True}
 
 
-def pytest_addoption(parser):
-    group = parser.getgroup("pytest-bug")
+def pytest_addoption(parser: Parser):
+    group = parser.getgroup(ORT_GROUP)
+
+    def _add_option(name: str, help_text: str, default: str, metavar: str) -> None:
+        op_name = f"--{name.replace('_', '-')}"
+        group.addoption(
+            op_name,
+            action="store",
+            metavar=metavar,
+            help=f"{help_text} (default: {default})",
+            dest=name,
+        )
+        parser.addini(
+            name=name, help=f"{help_text} (default: {default})", default=default
+        )
+
     group.addoption(
         "--bug-no-stats",
         action="store_true",
         help="Disabling summary statistics",
         default=False,
+        dest="bug_summary_stats",
     )
     group.addoption(
         "--bug-pattern",
         action="store",
-        metavar="REGEX",
+        metavar=Metavar.REGEX,
         help="Run matching tests marked as bug",
     )
     group.addoption(
@@ -72,88 +99,63 @@ def pytest_addoption(parser):
         help="Disables all bugs in the run",
         default=False,
     )
-    group.addoption(
-        "--bug-skip-letter",
-        action="store",
-        metavar="LETTER",
-        help="Set to output in console for skip-bug (default: b)",
+    _add_option(
+        name="bug_skip_letter",
+        help_text="Set to output in console for skip-bug",
+        default=SkipBug.letter,
+        metavar=Metavar.LETTER,
     )
-    group.addoption(
-        "--bug-skip-word",
-        action="store",
-        metavar="WORLD",
-        help="Set to output in console for skip-bug verbosity (default: BUG-SKIP)",
+    _add_option(
+        name="bug_skip_word",
+        help_text="Set to output in console for skip-bug verbosity",
+        default=SkipBug.word,
+        metavar=Metavar.WORLD,
     )
-    group.addoption(
-        "--bug-fail-letter",
-        action="store",
-        metavar="LETTER",
-        help="Set to output in console for fail-bug (default: f)",
+    _add_option(
+        name="bug_fail_letter",
+        help_text="Set to output in console for fail-bug",
+        default=FailBug.letter,
+        metavar=Metavar.LETTER,
     )
-    group.addoption(
-        "--bug-fail-word",
-        action="store",
-        metavar="WORLD",
-        help="Set to output in console for fail-bug verbosity (default: BUG-FAIL)",
+    _add_option(
+        name="bug_fail_word",
+        help_text="Set to output in console for fail-bug verbosity",
+        default=FailBug.word,
+        metavar=Metavar.WORLD,
     )
-    group.addoption(
-        "--bug-pass-letter",
-        action="store",
-        metavar="LETTER",
-        help="Set to output in console for pass-bug (default: p)",
+    _add_option(
+        name="bug_pass_letter",
+        help_text="Set to output in console for pass-bug",
+        default=PassBug.letter,
+        metavar=Metavar.LETTER,
     )
-    group.addoption(
-        "--bug-pass-word",
-        action="store",
-        metavar="WORLD",
-        help="Set to output in console for fail-bug verbosity (default: BUG-PASS)",
+    _add_option(
+        name="bug_pass_word",
+        help_text="Set to output in console for fail-bug verbosity",
+        default=PassBug.word,
+        metavar=Metavar.WORLD,
     )
 
-    # add ini params
     parser.addini(
         "bug_summary_stats",
         help="Display summary statistics",
         default=True,
         type="bool",
     )
-    parser.addini(
-        "bug_skip_letter",
-        help="Set to output in console for skip-bug (default: b)",
-    )
-    parser.addini(
-        "bug_skip_word",
-        help="Set to output in console for skip-bug verbosity (default: BUG-SKIP)",
-    )
-    parser.addini(
-        "bug_fail_letter",
-        help="Set to output in console for fail-bug (default: f)",
-    )
-    parser.addini(
-        "bug_fail_word",
-        help="Set to output in console for fail-bug verbosity (default: BUG-FAIL)",
-    )
-    parser.addini(
-        "bug_pass_letter",
-        help="Set to output in console for pass-bug (default: p)",
-    )
-    parser.addini(
-        "bug_pass_word",
-        help="Set to output in console for fail-bug verbosity (default: BUG-PASS)",
-    )
 
 
-def pytest_addhooks(pluginmanager):
+def pytest_addhooks(pluginmanager: PytestPluginManager):
     pluginmanager.add_hookspecs(hooks)
 
 
-def pytest_configure(config):
+def pytest_configure(config: Config):
     bug = PyTestBug(config)
     config._bug = bug
     config.pluginmanager.register(bug)
 
 
 class PyTestBug:
-    def __init__(self, config):
+    def __init__(self, config: Config):
         self.config = config
         self._skipped = 0
         self._failed = 0
@@ -185,41 +187,19 @@ class PyTestBug:
             run = False
         return ", ".join(comment) if comment else "no comment", run
 
-    @staticmethod
-    def pytest_configure(config):
-        config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
-        letter_skip = config.getoption("--bug-skip-letter") or config.getini(
-            "bug_skip_letter"
-        )
-        if letter_skip:
-            SkipBug.letter = letter_skip
-        word_skip = config.getoption("--bug-skip-word") or config.getini(
-            "bug_skip_word"
-        )
-        if word_skip:
-            SkipBug.word = word_skip
-        letter_fail = config.getoption("--bug-fail-letter") or config.getini(
-            "bug_fail_letter"
-        )
-        if letter_fail:
-            FailBug.letter = letter_fail
-        word_fail = config.getoption("--bug-fail-word") or config.getini(
-            "bug_fail_word"
-        )
-        if word_fail:
-            FailBug.word = word_fail
-        letter_pass = config.getoption("--bug-pass-letter") or config.getini(
-            "bug_pass_letter"
-        )
-        if letter_pass:
-            PassBug.letter = letter_pass
-        word_pass = config.getoption("--bug-pass-word") or config.getini(
-            "bug_pass_word"
-        )
-        if word_pass:
-            PassBug.word = word_pass
+    def _get_value(self, key: str) -> str:
+        return self.config.getoption(key) or self.config.getini(key)
 
-    def pytest_collection_modifyitems(self, items, config):
+    def pytest_configure(self, config: Config):
+        config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
+        SkipBug.letter = self._get_value("bug_skip_letter")
+        SkipBug.word = self._get_value("bug_skip_word")
+        FailBug.letter = self._get_value("bug_fail_letter")
+        FailBug.word = self._get_value("bug_fail_word")
+        PassBug.letter = self._get_value("bug_pass_letter")
+        PassBug.word = self._get_value("bug_pass_word")
+
+    def pytest_collection_modifyitems(self, items: List[Function], config: Config):
         for item in items:
             bug_markers = tuple(item.iter_markers(name="bug"))
             if bug_markers:
@@ -249,13 +229,13 @@ class PyTestBug:
             items[:] = selected_items
 
     @staticmethod
-    def pytest_runtest_setup(item):
+    def pytest_runtest_setup(item: Function):
         mark_bug = getattr(item, MARK_BUG, None)
         if isinstance(mark_bug, MarkBug) and mark_bug.run is False:
             pytest.skip(mark_bug.comment)
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-    def pytest_runtest_makereport(self, item):
+    def pytest_runtest_makereport(self, item: Function):
         outcome = yield
         report = outcome.get_result()
         mark_bug = getattr(item, MARK_BUG, None)
@@ -269,7 +249,7 @@ class PyTestBug:
                     report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
-    def pytest_report_teststatus(self, report):
+    def pytest_report_teststatus(self, report: TestReport):
         mark_bug = getattr(report, MARK_BUG, None)
         if isinstance(mark_bug, ReportBug):
             self._counter(mark_bug)
@@ -278,8 +258,8 @@ class PyTestBug:
             )
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
 
-    def pytest_terminal_summary(self, terminalreporter):
-        if not self.config.getoption("--bug-no-stats") and self.config.getini(
+    def pytest_terminal_summary(self, terminalreporter: TerminalReporter):
+        if not self.config.getoption("bug_summary_stats") and self.config.getini(
             "bug_summary_stats"
         ):
             text = []
