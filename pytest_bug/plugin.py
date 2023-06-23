@@ -1,4 +1,5 @@
 import re
+from dataclasses import dataclass, field
 from typing import Dict, Tuple, List
 
 import pytest
@@ -21,14 +22,13 @@ class Metavar:
     REGEX = "REGEX"
 
 
+@dataclass()
 class MarkBug:
-    def __init__(self, comment: str = "no comment", run: bool = False):
-        """
-        :param comment: str
-        :param run: bool
-        """
-        self.comment = f"{START_COMMENT}{comment}"
-        self.run = run
+    comment: str = field(default="no comment")
+    run: bool = field(default=False)
+
+    def __post_init__(self):
+        self.comment = f"{START_COMMENT}{self.comment}"
 
 
 class ReportBug:
@@ -70,9 +70,7 @@ def pytest_addoption(parser: Parser):
             help=f"{help_text} (default: {default})",
             dest=name,
         )
-        parser.addini(
-            name=name, help=f"{help_text} (default: {default})", default=default
-        )
+        parser.addini(name=name, help=f"{help_text} (default: {default})", default=default)
 
     group.addoption(
         "--bug-no-stats",
@@ -220,12 +218,10 @@ class PyTestBug:
             for item in items:
                 mark_bug = getattr(item, MARK_BUG, None)
                 if mark_bug is not None:
-                    comment = mark_bug.comment[len(START_COMMENT) :]
+                    comment = mark_bug.comment[len(START_COMMENT):]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
-            config.hook.pytest_deselected(
-                items=[i for i in items if i not in selected_items]
-            )
+            config.hook.pytest_deselected(items=[i for i in items if i not in selected_items])
             items[:] = selected_items
 
     @staticmethod
@@ -253,15 +249,11 @@ class PyTestBug:
         mark_bug = getattr(report, MARK_BUG, None)
         if isinstance(mark_bug, ReportBug):
             self._counter(mark_bug)
-            self.config.hook.pytest_bug_report_teststatus(
-                report=report, report_bug=mark_bug
-            )
+            self.config.hook.pytest_bug_report_teststatus(report=report, report_bug=mark_bug)
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
 
     def pytest_terminal_summary(self, terminalreporter: TerminalReporter):
-        if not self.config.getoption("bug_summary_stats") and self.config.getini(
-            "bug_summary_stats"
-        ):
+        if not self.config.getoption("bug_summary_stats") and self.config.getini("bug_summary_stats"):
             text = []
             if self._skipped:
                 text.append(f"Bugs skipped: {self._skipped}")

@@ -1,22 +1,19 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: pytest-bug
+name: tests
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.6", "3.7", "3.8", "3.9", "3.10", "3.11" ]
+        python-version: [ "3.7", "3.8", "3.9", "3.10", "3.11" ]
 
     steps:
       - uses: actions/checkout@v2
@@ -31,7 +28,7 @@ jobs:
           python -m pip install -e .
       - name: Black
         run: |
-          black --check pytest_bug
+          black --line-length=120 --check pytest_bug
       - name: Test with pytest
         run: |
           pytest tests
