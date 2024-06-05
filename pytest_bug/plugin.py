@@ -215,7 +215,7 @@ class PyTestBug:
             selected_items = []
             for item in items:
                 if (mark_bug := getattr(item, MARK_BUG, None)) is not None:
-                    comment = mark_bug.comment[len(START_COMMENT):]
+                    comment = mark_bug.comment[len(START_COMMENT) :]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
             config.hook.pytest_deselected(items=[i for i in items if i not in selected_items])
