@@ -31,4 +31,4 @@ jobs:
           black --line-length=120 --check pytest_bug
       - name: Test with pytest
         run: |
-          pytest tests
+          coverage run --source=./pytest_bug -m pytest ./tests && coverage report -m

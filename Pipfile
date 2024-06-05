@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 black = "==24.4.2"
 pytest = "==8.2.2"
-pytest-cov = "==5.0.0"
+coverage = "==7.5.3"
 
 [packages]
 pytest-bug = { editable = true, path = "." }
@@ -18,5 +18,5 @@ python_version = "3.11"
 allow_prereleases = true
 
 [scripts]
-tests = "pytest tests"
+tests = "bash -c 'coverage run --source=./pytest_bug -m pytest ./tests && coverage report -m'"
 black = "black --line-length=120 pytest_bug"
