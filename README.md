@@ -1,9 +1,9 @@
 # pytest-bug
 
 [![PyPI](https://img.shields.io/pypi/v/pytest-bug.svg?color=%2301a001&label=pypi)](https://pypi.org/project/pytest-bug/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytest-bug.svg)](https://pypi.org/project/pytest-bug/)
-[![pytes_support](https://img.shields.io/badge/pytest-%3E%3D7.1.0-blue.svg)](https://github.com/pytest-dev/pytest/releases)
 [![Downloads](https://pepy.tech/badge/pytest-bug)](https://pepy.tech/project/pytest-bug)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pytest-bug.svg)](https://pypi.org/project/pytest-bug/)
+[![pytes_support](https://img.shields.io/badge/pytest-%3E%3D8.0.0-blue.svg)](https://github.com/pytest-dev/pytest/releases)
 [![Build Pypi](https://github.com/tolstislon/pytest-bug/actions/workflows/python-publish.yml/badge.svg)](https://github.com/tolstislon/pytest-bug/actions/workflows/python-publish.yml)
 
 [Pytest](https://github.com/pytest-dev/pytest) plugin for marking tests as a bug

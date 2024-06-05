@@ -11,15 +11,15 @@ from _pytest.terminal import TerminalReporter
 
 from . import hooks
 
-MARK_BUG = "_mark_bug"
-START_COMMENT = "BUG: "
-ORT_GROUP = "pytest-bug"
+MARK_BUG: str = "_mark_bug"
+START_COMMENT: str = "BUG: "
+ORT_GROUP: str = "pytest-bug"
 
 
 class Metavar:
-    LETTER = "LETTER"
-    WORLD = "WORLD"
-    REGEX = "REGEX"
+    LETTER: str = "LETTER"
+    WORLD: str = "WORLD"
+    REGEX: str = "REGEX"
 
 
 @dataclass()
@@ -155,11 +155,11 @@ def pytest_configure(config: Config):
 class PyTestBug:
     def __init__(self, config: Config):
         self.config = config
-        self._skipped = 0
-        self._failed = 0
-        self._passed = 0
-        self._all_run = config.getoption("--bug-all-run")
-        self._all_skip = config.getoption("--bug-all-skip")
+        self._skipped: int = 0
+        self._failed: int = 0
+        self._passed: int = 0
+        self._all_run: bool = config.getoption("--bug-all-run")
+        self._all_skip: bool = config.getoption("--bug-all-skip")
 
     def _counter(self, mark: ReportBug) -> None:
         """
@@ -199,8 +199,7 @@ class PyTestBug:
 
     def pytest_collection_modifyitems(self, items: List[Function], config: Config):
         for item in items:
-            bug_markers = tuple(item.iter_markers(name="bug"))
-            if bug_markers:
+            if bug_markers := tuple(item.iter_markers(name="bug")):
                 runs = []
                 comments = []
                 for i in bug_markers:
@@ -212,13 +211,11 @@ class PyTestBug:
                 setattr(item, MARK_BUG, mark_bug)
                 config.hook.pytest_bug_item_mark(item=item, config=config)
 
-        bug_pattern = config.getoption("--bug-pattern")
-        if bug_pattern:
+        if bug_pattern := config.getoption("--bug-pattern"):
             selected_items = []
             for item in items:
-                mark_bug = getattr(item, MARK_BUG, None)
-                if mark_bug is not None:
-                    comment = mark_bug.comment[len(START_COMMENT) :]
+                if (mark_bug := getattr(item, MARK_BUG, None)) is not None:
+                    comment = mark_bug.comment[len(START_COMMENT):]
                     if re.search(bug_pattern, comment, re.I):
                         selected_items.append(item)
             config.hook.pytest_deselected(items=[i for i in items if i not in selected_items])
@@ -234,8 +231,7 @@ class PyTestBug:
     def pytest_runtest_makereport(self, item: Function):
         outcome = yield
         report = outcome.get_result()
-        mark_bug = getattr(item, MARK_BUG, None)
-        if isinstance(mark_bug, MarkBug):
+        if isinstance(mark_bug := getattr(item, MARK_BUG, None), MarkBug):
             if report.skipped:
                 setattr(report, MARK_BUG, SkipBug(mark_bug.comment))
             elif report.when == "call":
@@ -246,8 +242,7 @@ class PyTestBug:
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
     def pytest_report_teststatus(self, report: TestReport):
-        mark_bug = getattr(report, MARK_BUG, None)
-        if isinstance(mark_bug, ReportBug):
+        if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
             self.config.hook.pytest_bug_report_teststatus(report=report, report_bug=mark_bug)
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)

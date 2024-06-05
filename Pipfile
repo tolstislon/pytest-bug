@@ -4,9 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-black = "==23.9.1"
-pytest = "==7.4.2"
-pytest-cov = "==4.1.0"
+black = "==24.4.2"
+pytest = "==8.2.2"
+pytest-cov = "==5.0.0"
 
 [packages]
 pytest-bug = { editable = true, path = "." }
