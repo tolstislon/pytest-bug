@@ -238,14 +238,13 @@ class PyTestBug:
                 if report.passed:
                     setattr(report, MARK_BUG, PassBug(mark_bug.comment))
                 elif report.failed:
-                    report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
     def pytest_report_teststatus(self, report: TestReport):
         if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
             self.config.hook.pytest_bug_report_teststatus(report=report, report_bug=mark_bug)
-            return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
+            return report.outcome, mark_bug.letter, mark_bug.word
 
     def pytest_terminal_summary(self, terminalreporter: TerminalReporter):
         if not self.config.getoption("bug_summary_stats") and self.config.getini("bug_summary_stats"):
