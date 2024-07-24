@@ -12,7 +12,7 @@ coverage = "==7.5.3"
 pytest-bug = { editable = true, path = "." }
 
 [requires]
-python_version = "3.11"
+python_version = "3.12"
 
 [pipenv]
 allow_prereleases = true

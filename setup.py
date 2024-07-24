@@ -2,7 +2,9 @@ from pathlib import Path
 
 from setuptools import find_packages, setup
 
-readme_file = Path(__file__).parent.absolute().joinpath("README.md")
+readme_file = Path(__file__).parent.absolute() / "README.md"
+if not readme_file.exists():
+    raise FileNotFoundError(f"README.md file not found: {readme_file}")
 with readme_file.open(encoding="utf-8") as file:
     long_description = file.read()
 
@@ -35,6 +37,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Testing",
         "Topic :: Software Development :: Quality Assurance",

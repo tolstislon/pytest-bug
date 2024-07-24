@@ -118,10 +118,11 @@ Options:
 | --bug-pass-word=WORLD    | Set to output in console for fail-bug verbosity (default: BUG-PASS) | bug_pass_word (string)   |
 
 #### Contributions are very welcome.
+
 ###### Getting started
 
-* python 3.11
-* pipenv 2022.12.19+
+* python 3.12
+* pipenv 2023.11.15+
 
 1. Clone the repository
     ```bash
