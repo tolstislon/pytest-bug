@@ -270,7 +270,7 @@ class PyTestBug:
                     report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
-    def pytest_report_teststatus(self, report: TestReport) -> Optional[tuple[str, str, tuple[str, str]]]:
+    def pytest_report_teststatus(self, report: TestReport) -> Optional[Tuple[str, str, Tuple[str, str]]]:
         """Report test status hook."""
         if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
