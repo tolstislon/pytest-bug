@@ -1,6 +1,8 @@
+"""Pytest Bug plugin."""
+
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Tuple, List
+from typing import Any, Dict, Generator, List, Optional, Tuple
 
 import pytest
 from _pytest.config import Config, PytestPluginManager
@@ -17,6 +19,8 @@ ORT_GROUP: str = "pytest-bug"
 
 
 class Metavar:
+    """Meta variables."""
+
     LETTER: str = "LETTER"
     WORLD: str = "WORLD"
     REGEX: str = "REGEX"
@@ -24,41 +28,53 @@ class Metavar:
 
 @dataclass()
 class MarkBug:
+    """Bug marker."""
+
     comment: str = field(default="no comment")
     run: bool = field(default=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """Dataclass post initialization."""
         self.comment = f"{START_COMMENT}{self.comment}"
 
 
 class ReportBug:
+    """Base report."""
+
     letter: str = "u"
     word: str = "BUG-UNKNOWN"
     markup: Dict[str, bool] = {}
 
-    def __init__(self, comment):
+    def __init__(self, comment: str) -> None:
         self.comment = comment
 
 
 class SkipBug(ReportBug):
+    """Bug skip."""
+
     letter = "b"
     word = "BUG-SKIP"
     markup = {"yellow": True}
 
 
 class FailBug(ReportBug):
+    """Bug fail."""
+
     letter = "f"
     word = "BUG-FAIL"
     markup = {"red": True}
 
 
 class PassBug(ReportBug):
+    """Bug pass."""
+
     letter = "p"
     word = "BUG-PASS"
     markup = {"green": True}
 
 
-def pytest_addoption(parser: Parser):
+def pytest_addoption(parser: Parser) -> None:
+    """Add options."""
     group = parser.getgroup(ORT_GROUP)
 
     def _add_option(name: str, help_text: str, default: str, metavar: str) -> None:
@@ -142,18 +158,23 @@ def pytest_addoption(parser: Parser):
     )
 
 
-def pytest_addhooks(pluginmanager: PytestPluginManager):
+def pytest_addhooks(pluginmanager: PytestPluginManager) -> None:
+    """Add hooks."""
     pluginmanager.add_hookspecs(hooks)
 
 
-def pytest_configure(config: Config):
+def pytest_configure(config: Config) -> None:
+    """Configure pytest hooks."""
     bug = PyTestBug(config)
     config._bug = bug
     config.pluginmanager.register(bug)
 
 
 class PyTestBug:
-    def __init__(self, config: Config):
+    """Pytest Bug plugin."""
+
+    def __init__(self, config: Config) -> None:
+        """Class constructor."""
         self.config = config
         self._skipped: int = 0
         self._failed: int = 0
@@ -163,7 +184,9 @@ class PyTestBug:
 
     def _counter(self, mark: ReportBug) -> None:
         """
-        :param mark: Sub object ReportBug
+        Bug counter.
+
+        :param mark: Sub object ReportBug.
         """
         if isinstance(mark, SkipBug):
             self._skipped += 1
@@ -174,8 +197,10 @@ class PyTestBug:
 
     def _bug_mark(self, *args, run: bool = False, **kwargs) -> Tuple[str, bool]:
         """
-        :param run: bool
-        :return: Tuple[str, bool]
+        Mark test of the bug.
+
+        :param run: bool.
+        :return: Tuple[str, bool].
         """
         comment = [str(i) for i in args]
         comment.extend(f"{key}={value}" for key, value in kwargs.items())
@@ -188,7 +213,8 @@ class PyTestBug:
     def _get_value(self, key: str) -> str:
         return self.config.getoption(key) or self.config.getini(key)
 
-    def pytest_configure(self, config: Config):
+    def pytest_configure(self, config: Config) -> None:
+        """Configure hook."""
         config.addinivalue_line("markers", "bug(*args, run: bool): Mark test as a bug")
         SkipBug.letter = self._get_value("bug_skip_letter")
         SkipBug.word = self._get_value("bug_skip_word")
@@ -197,7 +223,8 @@ class PyTestBug:
         PassBug.letter = self._get_value("bug_pass_letter")
         PassBug.word = self._get_value("bug_pass_word")
 
-    def pytest_collection_modifyitems(self, items: List[Function], config: Config):
+    def pytest_collection_modifyitems(self, items: List[Function], config: Config) -> None:
+        """Modify item collection hook."""
         for item in items:
             if bug_markers := tuple(item.iter_markers(name="bug")):
                 runs = []
@@ -216,19 +243,21 @@ class PyTestBug:
             for item in items:
                 if (mark_bug := getattr(item, MARK_BUG, None)) is not None:
                     comment = mark_bug.comment[len(START_COMMENT) :]
-                    if re.search(bug_pattern, comment, re.I):
+                    if re.search(bug_pattern, comment, re.IGNORECASE):
                         selected_items.append(item)
             config.hook.pytest_deselected(items=[i for i in items if i not in selected_items])
             items[:] = selected_items
 
     @staticmethod
-    def pytest_runtest_setup(item: Function):
+    def pytest_runtest_setup(item: Function) -> None:
+        """Runtest setup hook."""
         mark_bug = getattr(item, MARK_BUG, None)
         if isinstance(mark_bug, MarkBug) and mark_bug.run is False:
             pytest.skip(mark_bug.comment)
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)
-    def pytest_runtest_makereport(self, item: Function):
+    def pytest_runtest_makereport(self, item: Function) -> Generator[None, Any, None]:
+        """Make report hook."""
         outcome = yield
         report = outcome.get_result()
         if isinstance(mark_bug := getattr(item, MARK_BUG, None), MarkBug):
@@ -241,13 +270,16 @@ class PyTestBug:
                     report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
-    def pytest_report_teststatus(self, report: TestReport):
+    def pytest_report_teststatus(self, report: TestReport) -> Optional[Tuple[str, str, Tuple[str, str]]]:
+        """Report test status hook."""
         if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
             self.config.hook.pytest_bug_report_teststatus(report=report, report_bug=mark_bug)
             return report.outcome, mark_bug.letter, (mark_bug.word, mark_bug.markup)
+        return None
 
-    def pytest_terminal_summary(self, terminalreporter: TerminalReporter):
+    def pytest_terminal_summary(self, terminalreporter: TerminalReporter) -> None:
+        """Terminal summary hook."""
         if not self.config.getoption("bug_summary_stats") and self.config.getini("bug_summary_stats"):
             text = []
             if self._skipped:

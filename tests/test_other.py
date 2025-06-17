@@ -1,9 +1,11 @@
 import re
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 
-def test_item_attr(testdir):
+def test_item_attr(testdir: pytest.Testdir):
     testdir.makeconftest(
         """        
         def pytest_runtest_makereport(item):
@@ -32,7 +34,7 @@ def test_item_attr(testdir):
     assert result.ret == 0
 
 
-def test_item_attr_no_comment(testdir):
+def test_item_attr_no_comment(testdir: pytest.Testdir):
     testdir.makeconftest(
         """        
         def pytest_runtest_makereport(item):
@@ -61,7 +63,7 @@ def test_item_attr_no_comment(testdir):
     assert result.ret == 0
 
 
-def test_report_item(testdir):
+def test_report_item(testdir: pytest.Testdir):
     testdir.makeconftest(
         """
         def pytest_runtest_logreport(report):
@@ -91,7 +93,7 @@ def test_report_item(testdir):
     assert result.ret == 0
 
 
-def test_report_item_no_comment(testdir):
+def test_report_item_no_comment(testdir: pytest.Testdir):
     testdir.makeconftest(
         """
         def pytest_runtest_logreport(report):
@@ -125,7 +127,7 @@ def test_report_item_no_comment(testdir):
     assert result.ret == 0
 
 
-def test_run_test_marked_as_bug(testdir):
+def test_run_test_marked_as_bug(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -142,15 +144,15 @@ def test_run_test_marked_as_bug(testdir):
             assert False
         """
     )
-    result = testdir.runpytest('-m bug')
+    result = testdir.runpytest("-m bug")
     assert result.ret == 0
     outcomes = result.parseoutcomes()
-    assert outcomes['passed'] == 1
-    assert outcomes['deselected'] == 1
-    assert outcomes['skipped'] == 1
+    assert outcomes["passed"] == 1
+    assert outcomes["deselected"] == 1
+    assert outcomes["skipped"] == 1
 
 
-def test_run_all_bugs(testdir):
+def test_run_all_bugs(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -167,13 +169,13 @@ def test_run_all_bugs(testdir):
             assert False
         """
     )
-    result = testdir.runpytest('--bug-all-run')
+    result = testdir.runpytest("--bug-all-run")
     result.assert_outcomes(skipped=1, passed=1, failed=1)
     stdout = result.stdout.str()
-    assert re.search(r'-\sBugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"-\sBugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_skip_all_bugs(testdir):
+def test_skip_all_bugs(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -190,13 +192,13 @@ def test_skip_all_bugs(testdir):
             assert False
         """
     )
-    result = testdir.runpytest('--bug-all-skip')
+    result = testdir.runpytest("--bug-all-skip")
     result.assert_outcomes(skipped=2, failed=1)
     stdout = result.stdout.str()
-    assert re.search(r'-\sBugs skipped: 2\s-', stdout)
+    assert re.search(r"-\sBugs skipped: 2\s-", stdout)
 
 
-def test_two_marks_comment(testdir):
+def test_two_marks_comment(testdir: pytest.Testdir):
     testdir.makeconftest(
         """        
         def pytest_runtest_makereport(item):
@@ -228,7 +230,7 @@ def test_two_marks_comment(testdir):
     assert result.ret == 0
 
 
-def test_several_marks_comment(testdir):
+def test_several_marks_comment(testdir: pytest.Testdir):
     testdir.makeconftest(
         """        
         def pytest_runtest_makereport(item):
@@ -254,7 +256,7 @@ def test_several_marks_comment(testdir):
     assert result.ret == 0
 
 
-def test_two_marks_run(testdir):
+def test_two_marks_run(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -290,5 +292,5 @@ def test_two_marks_run(testdir):
     assert result.ret == 0
     result.assert_outcomes(skipped=4, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py pbbbb', stdout)
-    assert re.search(r'-\sBugs skipped: 4 Bugs passed: 1\s-', stdout)
+    assert re.search(r"\w+\.py pbbbb", stdout)
+    assert re.search(r"-\sBugs skipped: 4 Bugs passed: 1\s-", stdout)

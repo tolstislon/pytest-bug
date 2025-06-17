@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13-dev" ]
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12", "3.13" ]
 
     steps:
       - uses: actions/checkout@v3
@@ -24,11 +24,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pytest black pytest-cov
+          python -m pip install pytest pytest-cov ruff==0.11.2
           python -m pip install -e .
-      - name: Black
-        run: |
-          black --line-length=120 --check pytest_bug
+      - name: Format check
+        run: ruff format --check
+      - name: Lints
+        run: ruff check
       - name: Test with pytest
         run: |
           coverage run --source=./pytest_bug -m pytest ./tests && coverage report -m

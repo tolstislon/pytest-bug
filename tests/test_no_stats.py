@@ -1,5 +1,7 @@
 import re
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 tests = """
@@ -19,17 +21,17 @@ tests = """
         """
 
 
-def test_disable_stats_option(testdir):
+def test_disable_stats_option(testdir: pytest.Testdir):
     testdir.makepyfile(tests)
-    result = testdir.runpytest('--bug-no-stats')
+    result = testdir.runpytest("--bug-no-stats")
     assert result.ret == 0
     result.assert_outcomes(skipped=2, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bfp', stdout)
-    assert not re.search('Bugs', stdout)
+    assert re.search(r"\w+\.py bfp", stdout)
+    assert not re.search("Bugs", stdout)
 
 
-def test_disable_stats_ini(testdir):
+def test_disable_stats_ini(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -41,11 +43,11 @@ def test_disable_stats_ini(testdir):
     assert result.ret == 0
     result.assert_outcomes(skipped=2, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bfp', stdout)
-    assert not re.search('Bugs', stdout)
+    assert re.search(r"\w+\.py bfp", stdout)
+    assert not re.search("Bugs", stdout)
 
 
-def test_disable_stats_option_enable_ini(testdir):
+def test_disable_stats_option_enable_ini(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -53,15 +55,15 @@ def test_disable_stats_option_enable_ini(testdir):
         """
     )
     testdir.makepyfile(tests)
-    result = testdir.runpytest('--bug-no-stats')
+    result = testdir.runpytest("--bug-no-stats")
     assert result.ret == 0
     result.assert_outcomes(skipped=2, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bfp', stdout)
-    assert not re.search('Bugs', stdout)
+    assert re.search(r"\w+\.py bfp", stdout)
+    assert not re.search("Bugs", stdout)
 
 
-def test_enable_ini(testdir):
+def test_enable_ini(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -73,5 +75,5 @@ def test_enable_ini(testdir):
     assert result.ret == 0
     result.assert_outcomes(skipped=2, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bfp', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py bfp", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)

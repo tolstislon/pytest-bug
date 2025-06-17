@@ -4,11 +4,11 @@ import pytest
 
 pytest_plugins = ("pytester",)
 
-PARAMETRIZE = (('import pytest', 'pytest.mark.'), ('from pytest_bug import bug', ''))
+PARAMETRIZE = (("import pytest", "pytest.mark."), ("from pytest_bug import bug", ""))
 
 
-@pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
-def test_mark_func_and_class(testdir, test_import, test_mark):
+@pytest.mark.parametrize(("test_import", "test_mark"), PARAMETRIZE)
+def test_mark_func_and_class(testdir: pytest.Testdir, test_import: str, test_mark: str):
     testdir.makepyfile(
         f"""
         {test_import}
@@ -48,12 +48,12 @@ def test_mark_func_and_class(testdir, test_import, test_mark):
     assert result.ret == 0
     result.assert_outcomes(passed=2, skipped=5)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bfpbbfp', stdout)
-    assert re.search(r'-\sBugs skipped: 3 Bugs passed: 2 Bugs failed: 2\s-', stdout)
+    assert re.search(r"\w+\.py bfpbbfp", stdout)
+    assert re.search(r"-\sBugs skipped: 3 Bugs passed: 2 Bugs failed: 2\s-", stdout)
 
 
-@pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
-def test_mark_module_no_run(testdir, test_import, test_mark):
+@pytest.mark.parametrize(("test_import", "test_mark"), PARAMETRIZE)
+def test_mark_module_no_run(testdir: pytest.Testdir, test_import: str, test_mark: str):
     testdir.makepyfile(
         f"""
         {test_import}
@@ -71,12 +71,12 @@ def test_mark_module_no_run(testdir, test_import, test_mark):
     assert result.ret == 0
     result.assert_outcomes(skipped=2)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py bb', stdout)
-    assert re.search(r'-\sBugs skipped: 2\s-', stdout)
+    assert re.search(r"\w+\.py bb", stdout)
+    assert re.search(r"-\sBugs skipped: 2\s-", stdout)
 
 
-@pytest.mark.parametrize('test_import, test_mark', PARAMETRIZE)
-def test_mark_module_run_true(testdir, test_import, test_mark):
+@pytest.mark.parametrize(("test_import", "test_mark"), PARAMETRIZE)
+def test_mark_module_run_true(testdir: pytest.Testdir, test_import: str, test_mark: str):
     testdir.makepyfile(
         f"""
         {test_import}
@@ -94,5 +94,5 @@ def test_mark_module_run_true(testdir, test_import, test_mark):
     assert result.ret == 0
     result.assert_outcomes(skipped=1, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py fp', stdout)
-    assert re.search(r'-\sBugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py fp", stdout)
+    assert re.search(r"-\sBugs passed: 1 Bugs failed: 1\s-", stdout)

@@ -4,9 +4,9 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-black = "==24.4.2"
 pytest = "==8.2.2"
 coverage = "==7.5.3"
+ruff = "==0.11.2"
 
 [packages]
 pytest-bug = { editable = true, path = "." }
@@ -19,4 +19,5 @@ allow_prereleases = true
 
 [scripts]
 tests = "bash -c 'coverage run --source=./pytest_bug -m pytest ./tests && coverage report -m'"
-black = "black --line-length=120 pytest_bug"
+format = "ruff format"
+check = "ruff check --fix"

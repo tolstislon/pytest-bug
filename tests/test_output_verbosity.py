@@ -1,9 +1,11 @@
 import re
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 
-def test_func_and_class(testdir):
+def test_func_and_class(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
             import pytest
@@ -39,21 +41,21 @@ def test_func_and_class(testdir):
                     assert True
             """
     )
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
     assert result.ret == 0
     result.assert_outcomes(passed=2, skipped=5)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py::test_one BUG-SKIP', stdout)
-    assert re.search(r'\w+\.py::test_two BUG-FAIL', stdout)
-    assert re.search(r'\w+\.py::test_three BUG-PASS', stdout)
-    assert re.search(r'\w+\.py::TestFour::test_one BUG-SKIP', stdout)
-    assert re.search(r'\w+\.py::TestFour::test_two BUG-SKIP', stdout)
-    assert re.search(r'\w+\.py::TestFive::test_one BUG-FAIL', stdout)
-    assert re.search(r'\w+\.py::TestFive::test_two BUG-PASS', stdout)
-    assert re.search(r'-\sBugs skipped: 3 Bugs passed: 2 Bugs failed: 2\s-', stdout)
+    assert re.search(r"\w+\.py::test_one BUG-SKIP", stdout)
+    assert re.search(r"\w+\.py::test_two BUG-FAIL", stdout)
+    assert re.search(r"\w+\.py::test_three BUG-PASS", stdout)
+    assert re.search(r"\w+\.py::TestFour::test_one BUG-SKIP", stdout)
+    assert re.search(r"\w+\.py::TestFour::test_two BUG-SKIP", stdout)
+    assert re.search(r"\w+\.py::TestFive::test_one BUG-FAIL", stdout)
+    assert re.search(r"\w+\.py::TestFive::test_two BUG-PASS", stdout)
+    assert re.search(r"-\sBugs skipped: 3 Bugs passed: 2 Bugs failed: 2\s-", stdout)
 
 
-def test_module_run_true(testdir):
+def test_module_run_true(testdir: pytest.Testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -67,10 +69,10 @@ def test_module_run_true(testdir):
             assert True
         """
     )
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
     assert result.ret == 0
     result.assert_outcomes(skipped=1, passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py::test_one BUG-FAIL', stdout)
-    assert re.search(r'\w+\.py::test_two BUG-PASS', stdout)
-    assert re.search(r'-\sBugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py::test_one BUG-FAIL", stdout)
+    assert re.search(r"\w+\.py::test_two BUG-PASS", stdout)
+    assert re.search(r"-\sBugs passed: 1 Bugs failed: 1\s-", stdout)
