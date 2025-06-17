@@ -1,8 +1,9 @@
 """Pytest Bug plugin."""
 
 import re
+from collections.abc import Generator
 from dataclasses import dataclass, field
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, Optional
 
 import pytest
 from _pytest.config import Config, PytestPluginManager
@@ -43,7 +44,7 @@ class ReportBug:
 
     letter: str = "u"
     word: str = "BUG-UNKNOWN"
-    markup: Dict[str, bool] = {}
+    markup: dict[str, bool] = {}
 
     def __init__(self, comment: str) -> None:
         self.comment = comment
@@ -195,12 +196,12 @@ class PyTestBug:
         elif isinstance(mark, PassBug):
             self._passed += 1
 
-    def _bug_mark(self, *args, run: bool = False, **kwargs) -> Tuple[str, bool]:
+    def _bug_mark(self, *args, run: bool = False, **kwargs) -> tuple[str, bool]:
         """
         Mark test of the bug.
 
         :param run: bool.
-        :return: Tuple[str, bool].
+        :return: tuple[str, bool].
         """
         comment = [str(i) for i in args]
         comment.extend(f"{key}={value}" for key, value in kwargs.items())
@@ -223,7 +224,7 @@ class PyTestBug:
         PassBug.letter = self._get_value("bug_pass_letter")
         PassBug.word = self._get_value("bug_pass_word")
 
-    def pytest_collection_modifyitems(self, items: List[Function], config: Config) -> None:
+    def pytest_collection_modifyitems(self, items: list[Function], config: Config) -> None:
         """Modify item collection hook."""
         for item in items:
             if bug_markers := tuple(item.iter_markers(name="bug")):
@@ -270,7 +271,7 @@ class PyTestBug:
                     report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
-    def pytest_report_teststatus(self, report: TestReport) -> Optional[Tuple[str, str, Tuple[str, str]]]:
+    def pytest_report_teststatus(self, report: TestReport) -> Optional[tuple[str, str, tuple[str, str]]]:
         """Report test status hook."""
         if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
