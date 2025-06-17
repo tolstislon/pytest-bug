@@ -1,9 +1,11 @@
 import re
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 
-def test_pytest_bug_set_mark(testdir):
+def test_pytest_bug_set_mark(testdir: pytest.Testdir):
     testdir.makeconftest(
         """
         import pytest
@@ -32,7 +34,7 @@ def test_pytest_bug_set_mark(testdir):
     result.assert_outcomes(passed=1)
 
 
-def test_pytest_bug_report_teststatus(testdir):
+def test_pytest_bug_report_teststatus(testdir: pytest.Testdir):
     testdir.makeconftest(
         """
         import pytest
@@ -55,4 +57,4 @@ def test_pytest_bug_report_teststatus(testdir):
     assert result.ret == 0
     result.assert_outcomes(passed=1)
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py 1', stdout)
+    assert re.search(r"\w+\.py 1", stdout)

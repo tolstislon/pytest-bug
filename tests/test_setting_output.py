@@ -1,5 +1,7 @@
 import re
 
+import pytest
+
 pytest_plugins = ("pytester",)
 
 TESTS = """
@@ -19,27 +21,27 @@ TESTS = """
         """
 
 
-def test_set_options_letter(testdir):
+def test_set_options_letter(testdir: pytest.Testdir):
     testdir.makepyfile(TESTS)
-    result = testdir.runpytest('--bug-skip-letter=q', '--bug-fail-letter=z', '--bug-pass-letter=r')
+    result = testdir.runpytest("--bug-skip-letter=q", "--bug-fail-letter=z", "--bug-pass-letter=r")
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py qzr', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py qzr", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_set_options_word(testdir):
+def test_set_options_word(testdir: pytest.Testdir):
     testdir.makepyfile(TESTS)
-    result = testdir.runpytest('-v', '--bug-skip-word=FORGET', '--bug-fail-word=FUCK', '--bug-pass-word=YAHOO')
+    result = testdir.runpytest("-v", "--bug-skip-word=FORGET", "--bug-fail-word=FUCK", "--bug-pass-word=YAHOO")
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py::test_one FORGET', stdout)
-    assert re.search(r'\w+\.py::test_two FUCK', stdout)
-    assert re.search(r'\w+\.py::test_three YAHOO', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py::test_one FORGET", stdout)
+    assert re.search(r"\w+\.py::test_two FUCK", stdout)
+    assert re.search(r"\w+\.py::test_three YAHOO", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_set_ini_letter(testdir):
+def test_set_ini_letter(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -52,11 +54,11 @@ def test_set_ini_letter(testdir):
     result = testdir.runpytest()
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py qzr', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py qzr", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_set_ini_word(testdir):
+def test_set_ini_word(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -66,16 +68,16 @@ def test_set_ini_word(testdir):
         """
     )
     testdir.makepyfile(TESTS)
-    result = testdir.runpytest('-v')
+    result = testdir.runpytest("-v")
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py::test_one FORGET', stdout)
-    assert re.search(r'\w+\.py::test_two FUCK', stdout)
-    assert re.search(r'\w+\.py::test_three YAHOO', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py::test_one FORGET", stdout)
+    assert re.search(r"\w+\.py::test_two FUCK", stdout)
+    assert re.search(r"\w+\.py::test_three YAHOO", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_set_option_priority_letter(testdir):
+def test_set_option_priority_letter(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -85,14 +87,14 @@ def test_set_option_priority_letter(testdir):
         """
     )
     testdir.makepyfile(TESTS)
-    result = testdir.runpytest('--bug-skip-letter=q', '--bug-fail-letter=z', '--bug-pass-letter=r')
+    result = testdir.runpytest("--bug-skip-letter=q", "--bug-fail-letter=z", "--bug-pass-letter=r")
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py qzr', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py qzr", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
 
 
-def test_set_option_priority_word(testdir):
+def test_set_option_priority_word(testdir: pytest.Testdir):
     testdir.makeini(
         """
         [pytest]
@@ -102,10 +104,10 @@ def test_set_option_priority_word(testdir):
         """
     )
     testdir.makepyfile(TESTS)
-    result = testdir.runpytest('-v', '--bug-skip-word=FORGET', '--bug-fail-word=FUCK', '--bug-pass-word=YAHOO')
+    result = testdir.runpytest("-v", "--bug-skip-word=FORGET", "--bug-fail-word=FUCK", "--bug-pass-word=YAHOO")
     assert result.ret == 0
     stdout = result.stdout.str()
-    assert re.search(r'\w+\.py::test_one FORGET', stdout)
-    assert re.search(r'\w+\.py::test_two FUCK', stdout)
-    assert re.search(r'\w+\.py::test_three YAHOO', stdout)
-    assert re.search(r'-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-', stdout)
+    assert re.search(r"\w+\.py::test_one FORGET", stdout)
+    assert re.search(r"\w+\.py::test_two FUCK", stdout)
+    assert re.search(r"\w+\.py::test_three YAHOO", stdout)
+    assert re.search(r"-\sBugs skipped: 1 Bugs passed: 1 Bugs failed: 1\s-", stdout)
