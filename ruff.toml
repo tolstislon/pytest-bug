@@ -33,6 +33,26 @@ select = [
     "FLY", # flynt
     "PL", # Pylint
     "RSE", # flake8-raise
+    "ERA", # eradicate (Закомменченый код)
+    "BLE", # flake8-blind-except
+    "FBT", # flake8-boolean-trap
+    "DTZ", # flake8-datetimez
+    "INT", # flake8-gettext
+    "TC", # flake8-type-checking
+    "W", # pycodestyle (warning)
+    "PLR", # Refactor
+    "PLW", # Warning
+    "TRY", # Warning
+    "ASYNC", # flake8-async
+    "T10", # flake8-debugger
+    "EM", # flake8-errmsg
+    "EXE", # flake8-executable
+    "LOG", # flake8-logging
+    "G", # flake8-logging-format
+    "SLF", # flake8-self
+    "SLOT", # flake8-slots
+    "TID", # flake8-tidy-imports
+    "PLE", # Pylint Error
 ]
 ignore = [
     "S311", # Standard pseudo-random generators are not suitable for cryptographic purposesStandard pseudo-random generators are not suitable for cryptographic purposes
@@ -46,10 +66,12 @@ ignore = [
     "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
     "D107", # Missing docstring in `__init__`
     "D401", # First line of docstring should be in imperative mood:
+    "EM102", # Exception must not use an f-string literal, assign to variable first
+    "TRY003", # Avoid specifying long messages outside the exception class
 ]
 
 [lint.per-file-ignores]
-"test_*.py" = ["S101", "D103", "ANN201", "D100", "S605", "S607", "PLR2004"]
+"test_*.py" = ["S101", "D103", "ANN201", "D100", "S605", "S607", "PLR2004", "W293", "W291"]
 "hooks.py" = ["ANN001", "ANN201"]
 
 [lint.flake8-pytest-style]
