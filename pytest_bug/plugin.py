@@ -3,7 +3,7 @@
 import re
 from collections.abc import Generator
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 import pytest
 from _pytest.config import Config, PytestPluginManager
@@ -271,7 +271,7 @@ class PyTestBug:
                     report.outcome, report.wasxfail = ("skipped", "skipped")
                     setattr(report, MARK_BUG, FailBug(mark_bug.comment))
 
-    def pytest_report_teststatus(self, report: TestReport) -> Optional[tuple[str, str, tuple[str, str]]]:
+    def pytest_report_teststatus(self, report: TestReport) -> tuple[str, str, tuple[str, str]] | None:
         """Report test status hook."""
         if isinstance(mark_bug := getattr(report, MARK_BUG, None), ReportBug):
             self._counter(mark_bug)
