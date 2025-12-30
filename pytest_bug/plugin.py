@@ -167,7 +167,7 @@ def pytest_addhooks(pluginmanager: PytestPluginManager) -> None:
 def pytest_configure(config: Config) -> None:
     """Configure pytest hooks."""
     bug = PyTestBug(config)
-    config._bug = bug
+    config._bug = bug  # noqa: SLF001
     config.pluginmanager.register(bug)
 
 
