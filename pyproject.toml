@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=77", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pytest-bug"
+description = "Pytest plugin for marking tests as a bug"
+readme = "README.md"
+authors = [{ name = "tolstislon", email = "tolstislon@gmail.com" }]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["pytest>=9.0.0"]
+keywords = ["pytest"]
+dynamic = ["version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Framework :: Pytest",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/tolstislon/pytest-bug"
+Repository = "https://github.com/tolstislon/pytest-bug"
+
+[project.entry-points.pytest11]
+pytest_bug = "pytest_bug.plugin"
+
+[dependency-groups]
+dev = [
+    "pytest==9.0.2",
+    "pytest-xdist==3.8.0",
+    "coverage==7.13.1",
+    "ruff==0.14.10",
+]
+
+[tool.setuptools]
+packages = ["pytest_bug"]
+
+[tool.setuptools_scm]
+version_file = "pytest_bug/__version__.py"
+
+[tool.coverage.run]
+omit = ["pytest_bug/__version__.py"]
