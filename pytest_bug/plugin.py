@@ -1,5 +1,6 @@
 """Pytest Bug plugin."""
 
+import copy
 import re
 from collections.abc import Generator
 from dataclasses import dataclass, field
@@ -9,7 +10,7 @@ import pytest
 from _pytest.config import Config, PytestPluginManager
 from _pytest.config.argparsing import Parser
 from _pytest.python import Function
-from _pytest.reports import TestReport
+from _pytest.reports import CollectReport, TestReport
 from _pytest.terminal import TerminalReporter
 
 from . import hooks
@@ -72,6 +73,9 @@ class PassBug(ReportBug):
     letter = "p"
     word = "BUG-PASS"
     markup = {"green": True}
+
+
+REPORT_BUG_TYPES: dict[str, type[ReportBug]] = {cls.__name__: cls for cls in (SkipBug, FailBug, PassBug)}
 
 
 def pytest_addoption(parser: Parser) -> None:
@@ -162,6 +166,38 @@ def pytest_addoption(parser: Parser) -> None:
 def pytest_addhooks(pluginmanager: PytestPluginManager) -> None:
     """Add hooks."""
     pluginmanager.add_hookspecs(hooks)
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_report_to_serializable(report: TestReport | CollectReport) -> dict[str, Any] | None:
+    """
+    Serialize a report carrying a ReportBug (pytest-xdist support).
+
+    pytest-xdist sends reports from a worker to the controller through execnet, which only handles
+    built-in types: a ReportBug object on the report crashes the worker with ``DumpError``.
+    The object is replaced with a dict on a copy of the report; the original report is left untouched
+    for the other hooks of the worker. Reports without a ReportBug use the default pytest serialization.
+    """
+    report_bug = getattr(report, MARK_BUG, None)
+    if not isinstance(report_bug, ReportBug):
+        return None
+    report = copy.copy(report)
+    setattr(report, MARK_BUG, {"type": type(report_bug).__name__, "comment": report_bug.comment})
+    data = report._to_json()  # noqa: SLF001
+    data["$report_type"] = type(report).__name__
+    return data
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_report_from_serializable(data: dict[str, Any]) -> TestReport | CollectReport | None:
+    """Restore the ReportBug object on a report received from a pytest-xdist worker."""
+    report_bug = data.get(MARK_BUG)
+    if not isinstance(report_bug, dict) or "$report_type" not in data:
+        return None
+    report_cls = TestReport if data["$report_type"] == "TestReport" else CollectReport
+    report = report_cls._from_json(data)  # noqa: SLF001
+    setattr(report, MARK_BUG, REPORT_BUG_TYPES[report_bug["type"]](report_bug["comment"]))
+    return report
 
 
 def pytest_configure(config: Config) -> None:
