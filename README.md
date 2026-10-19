@@ -117,12 +117,18 @@ Options:
 | --bug-fail-word=WORLD    | Set to output in console for fail-bug verbosity (default: BUG-FAIL) | bug_fail_word (string)   |
 | --bug-pass-word=WORLD    | Set to output in console for fail-bug verbosity (default: BUG-PASS) | bug_pass_word (string)   |
 
+#### pytest-xdist
+
+The plugin works with [pytest-xdist](https://github.com/pytest-dev/pytest-xdist): reports of marked tests
+are passed from workers to the controller, so the symbols, verbosity words and summary statistics are the same
+as in a single-process run.
+
 #### Contributions are very welcome.
 
 ###### Getting started
 
-* python 3.12
-* pipenv 2023.11.15+
+* python 3.10+
+* [uv](https://docs.astral.sh/uv/)
 
 1. Clone the repository
     ```bash
@@ -131,18 +137,17 @@ Options:
    ```
 2. Install dev dependencies
     ```bash
-    pipenv install --dev
-    pipenv shell
+    uv sync
    ```
 3. Run ruff format
     ```bash
-    pipenv run format
+    uv run ruff format
    ```
 4. Run ruff check
     ```bash
-    pipenv run check
+    uv run ruff check --fix
    ```
 5. Run the tests
     ```bash
-    pipenv run tests
+    uv run coverage run --source=./pytest_bug -m pytest ./tests && uv run coverage report -m
    ```
